@@ -37,6 +37,8 @@ Sub area_click()
     Set newshp = Shapes(newshpname)
     newshp.Left = X
     newshp.Top = Y
+    newshp.Width = mazesize.Caption
+    newshp.Height = mazesize.Caption
     If newshp.Left < Shapes("area").Left Or newshp.Top < Shapes("area").Top Or newshp.Left + newshp.Width > Shapes("area").Left + Shapes("area").Width Or _
         newshp.Top + newshp.Height - 1 > Shapes("area").Top + Shapes("area").Height Then newshp.Delete
         Shapes("start").ZOrder (msoBringToFront)
@@ -453,7 +455,7 @@ Private Sub TextBox1_Change()
 If TextBox1.TextLength > 0 Then
 Dim i As Integer
 For i = 1 To TextBox1.TextLength
-If InStr(1, "abcdefghijklmnopqrstuvwxyzáàãâäéèêëíìîïóòõôöúùûüñýÿç0123456789-_?!%$# ", LCase(Mid(TextBox1.Text, i, 1)), vbTextCompare) = 0 Then TextBox1.Text = Left(TextBox1.Text, i - 1) & Right(TextBox1.Text, Len(TextBox1.Text) - i)
+If InStr(1, "abcdefghijklmnopqrstuvwxyzÃ¡Ã Ã£Ã¢Ã¤Ã©Ã¨ÃªÃ«Ã­Ã¬Ã®Ã¯Ã³Ã²ÃµÃ´Ã¶ÃºÃ¹Ã»Ã¼Ã±Ã½Ã¿Ã§0123456789-_?!%$# ", LCase(Mid(TextBox1.Text, i, 1)), vbTextCompare) = 0 Then TextBox1.Text = Left(TextBox1.Text, i - 1) & Right(TextBox1.Text, Len(TextBox1.Text) - i)
 Next
 Shapes("btn_applytitle_cover").Visible = msoFalse
 Else
@@ -479,3 +481,4 @@ Slide18.TextBox1.Text = EQL5_GetElementValue(Slide18.mazedata.Caption, "title", 
 Slide18.TextBox1.Visible = True
 ActivePresentation.SlideShowWindow.View.GotoSlide 18
 End Sub
+
