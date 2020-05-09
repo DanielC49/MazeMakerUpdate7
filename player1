@@ -1,0 +1,166 @@
+Option Explicit
+
+Sub loadmaze(mmpFile As String)
+Dim shp As Shape
+For Each shp In Slide5.Shapes.Range
+If Left(shp.Name, 5) = "block" Or Left(shp.Name, 4) = "coin" Then shp.Delete
+Next
+
+Dim data As String
+data = FS_ReadFile(mmpFile)
+data = data & vbNewLine
+
+ListBox1.clear
+Dim i As Integer
+Dim str As String
+Dim newshp As Shape
+Dim sn As String
+Dim concoins As Boolean
+str = data
+str = str & vbNewLine
+For i = 1 To Len(data) - Len(Replace(data, Chr(10), ""))
+ListBox1.AddItem Replace(Mid(str, 1, InStr(1, str, Chr(10), vbTextCompare)), vbNewLine, "")
+str = Right(str, Len(str) - Len(Mid(str, 1, InStr(1, str, Chr(10), vbTextCompare))))
+Next
+
+For i = 0 To ListBox1.ListCount - 1
+If Left(ListBox1.List(i), 9) = "version:4" Or Replace(ListBox1.List(i), " ", "") = "" Then
+ElseIf Left(ListBox1.List(i), 6) = "title:" Then
+Shapes("mazetitle").TextFrame.TextRange.Text = Right(ListBox1.List(i), Len(ListBox1.List(i)) - 6)
+ElseIf Left(ListBox1.List(i), 11) = "block_size:" Then
+mazesize.Caption = Right(ListBox1.List(i), Len(ListBox1.List(i)) - 11)
+Shapes("shp").Width = mazesize.Caption
+Shapes("shp").Height = mazesize.Caption
+Shapes("shp2").Width = mazesize.Caption
+Shapes("shp2").Height = mazesize.Caption
+Shapes("start").Width = mazesize.Caption
+Shapes("start").Height = mazesize.Caption
+Shapes("finish").Width = mazesize.Caption
+Shapes("finish").Height = mazesize.Caption
+ElseIf Left(ListBox1.List(i), 13) = "block_offset:" Then
+mazeoffset.Caption = Right(ListBox1.List(i), Len(ListBox1.List(i)) - 13)
+ElseIf Left(ListBox1.List(i), 11) = "dark_color:" Then
+Shapes("shp").Fill.ForeColor.RGB = Right(ListBox1.List(i), Len(ListBox1.List(i)) - 11)
+Shapes("mazeborder").Fill.ForeColor.RGB = Shapes("shp").Fill.ForeColor.RGB
+Background.Fill.ForeColor.RGB = Shapes("shp").Fill.ForeColor.RGB
+For Each shp In Slide5.Shapes.Range: If Left(shp.Name, 5) = "block" Or Left(shp.Name, 4) = "coin" Then shp.Fill.ForeColor.RGB = Shapes("shp").Fill.ForeColor.RGB
+Next
+ElseIf Left(ListBox1.List(i), 12) = "light_color:" Then
+Shapes("bg").Fill.ForeColor.RGB = Right(ListBox1.List(i), Len(ListBox1.List(i)) - 12)
+Shapes("mazetitle").TextFrame.TextRange.Font.Color.RGB = Shapes("bg").Fill.ForeColor.RGB
+Shapes("time").TextFrame.TextRange.Font.Color.RGB = Shapes("bg").Fill.ForeColor.RGB
+ElseIf Left(ListBox1.List(i), 5) = "time:" Then
+If Right(ListBox1.List(i), Len(ListBox1.List(i)) - 5) = "---" Then
+Shapes("time").Visible = msoFalse
+Else
+Shapes("time").Visible = msoTrue
+Shapes("time").TextFrame.TextRange.Text = Right(ListBox1.List(i), Len(ListBox1.List(i)) - 5) & " " & gamesettings_laguange_get("mazetime_suffix")
+End If
+ElseIf Left(ListBox1.List(i), 6) = "start:" Then
+Shapes("start").Left = Mid(ListBox1.List(i), 7, InStr(1, ListBox1.List(i), ",") - 7)
+Shapes("start").Top = Right(ListBox1.List(i), InStr(1, StrReverse(ListBox1.List(i)), ",") - 1)
+ElseIf Left(ListBox1.List(i), 7) = "finish:" Then
+Shapes("finish").Left = Mid(ListBox1.List(i), 8, InStr(1, ListBox1.List(i), ",") - 8)
+Shapes("finish").Top = Right(ListBox1.List(i), InStr(1, StrReverse(ListBox1.List(i)), ",") - 1)
+ElseIf Left(ListBox1.List(i), 6) = "_block" Then
+sn = Replace(ListBox1.List(i), "_", "")
+Shapes("shp").Duplicate.Name = Left(sn, InStr(1, sn, ":") - 1)
+Set newshp = Shapes(Left(sn, InStr(1, sn, ":") - 1))
+newshp.Left = Mid(sn, InStr(1, sn, ":") + 1, InStr(1, sn, ",") - InStr(1, sn, ":") - 1)
+newshp.Top = Right(sn, InStr(1, StrReverse(sn), ",") - 1)
+ElseIf Left(ListBox1.List(i), 5) = "_coin" Then
+sn = Replace(ListBox1.List(i), "_", "")
+Shapes("shp2").Duplicate.Name = Left(sn, InStr(1, sn, ":") - 1)
+Set newshp = Shapes(Left(sn, InStr(1, sn, ":") - 1))
+newshp.Left = Mid(sn, InStr(1, sn, ":") + 1, InStr(1, sn, ",") - InStr(1, sn, ":") - 1)
+newshp.Top = Right(sn, InStr(1, StrReverse(sn), ",") - 1)
+If concoins = False Then concoins = True
+Else
+MsgBox "Error, unknown: " & ListBox1.List(i)
+End If
+Next
+If concoins = True Then
+Shapes("ncoin").Visible = msoTrue
+Shapes("ncoins").Visible = msoTrue
+Shapes("ncoins").TextFrame.TextRange.Text = "0"
+Else
+Shapes("ncoin").Visible = msoFalse
+Shapes("ncoins").Visible = msoFalse
+End If
+Shapes("start").ZOrder (msoBringToFront)
+Shapes("finish").ZOrder (msoBringToFront)
+Shapes("cover").ZOrder (msoBringToFront)
+Shapes("cover").Visible = msoFalse
+End Sub
+
+Sub starttimer()
+Dim tick As Boolean
+tick = False
+Shapes("db").TextFrame.TextRange.Text = time
+Pausecode (0.5)
+Do While Shapes("cover").Visible = msoFalse And ActivePresentation.SlideShowWindow.View.CurrentShowPosition = 5
+Shapes("time").TextFrame.TextRange.Text = val(Replace(Shapes("time").TextFrame.TextRange.Text, " " & gamesettings_laguange_get("mazetime_suffix"), "")) - 1 & " " & gamesettings_laguange_get("mazetime_suffix")
+If val(Shapes("time").TextFrame.TextRange.Text) < 1 Then
+Slide6.Shapes("miss").Visible = msoFalse
+Slide6.Shapes("timeover").Visible = msoTrue
+Slide6.Shapes("gameovermsg").TextFrame.TextRange.Text = gamesettings_laguange_get("time_up")
+playSound (ActivePresentation.Path & "\MazeMaker_Data\sfx\game_hit.wav")
+If Shapes("ncoins").Visible = msoTrue Then
+Slide6.Shapes("collectedcoins").Visible = msoTrue
+Slide6.Shapes("collectedcoins").TextFrame.TextRange.Text = gamesettings_laguange_get("coins_collected") & ": " & Shapes("ncoins").TextFrame.TextRange.Text
+Else
+Slide6.Shapes("collectedcoins").Visible = msoFalse
+End If
+Shapes("db").TextFrame.TextRange.Text = time
+Pausecode (0.2)
+ActivePresentation.SlideShowWindow.View.GotoSlide 6, msoTrue
+End
+End If
+If val(Shapes("time").TextFrame.TextRange.Text) <= 3 And tick = False Then
+tick = True
+playSound (ActivePresentation.Path & "\MazeMaker_Data\sfx\timer_ticking.wav")
+End If
+Shapes("db").TextFrame.TextRange.Text = time
+Pausecode (1)
+Loop
+End Sub
+
+Sub shp_hover(shp As Shape)
+If Left(shp.Name, 5) = "block" Or Left(shp.Name, 11) = "mazeborder_" Then
+Slide6.Shapes("miss").Visible = msoTrue
+Slide6.Shapes("timeover").Visible = msoFalse
+Slide6.Shapes("gameovermsg").TextFrame.TextRange.Text = gamesettings_laguange_get("loose")
+Shapes("cover").Visible = msoTrue
+playSound (ActivePresentation.Path & "\MazeMaker_Data\sfx\game_hit.wav")
+shp.Fill.ForeColor.RGB = RGB(255, 25, 25)
+If Shapes("ncoins").Visible = msoTrue Then
+Slide6.Shapes("collectedcoins").Visible = msoTrue
+Slide6.Shapes("collectedcoins").TextFrame.TextRange.Text = gamesettings_laguange_get("coins_collected") & ": " & Shapes("ncoins").TextFrame.TextRange.Text
+Else
+Slide6.Shapes("collectedcoins").Visible = msoFalse
+End If
+Shapes("db").TextFrame.TextRange.Text = time
+Pausecode (0.2)
+ActivePresentation.SlideShowWindow.View.GotoSlide 6, msoTrue
+ElseIf Left(shp.Name, 4) = "coin" Then
+shp.Delete
+Shapes("ncoins").TextFrame.TextRange.Text = val(Shapes("ncoins").TextFrame.TextRange.Text) + 1
+playSound (ActivePresentation.Path & "\MazeMaker_Data\sfx\coin_collect.wav")
+End If
+End Sub
+
+Sub finish_hover()
+If Shapes("ncoins").Visible = msoTrue Then
+Slide7.Shapes("collectedcoins").Visible = msoTrue
+Slide7.Shapes("collectedcoins").TextFrame.TextRange.Text = gamesettings_laguange_get("coins_collected") & ": " & Shapes("ncoins").TextFrame.TextRange.Text
+Else
+Slide7.Shapes("collectedcoins").Visible = msoFalse
+End If
+playSound (ActivePresentation.Path & "\MazeMaker_Data\sfx\game_win_transition.wav")
+ActivePresentation.SlideShowWindow.View.GotoSlide 7, msoTrue
+End Sub
+
+Sub editmaze()
+ActivePresentation.SlideShowWindow.View.GotoSlide 3, msoTrue
+playSound (ActivePresentation.Path & "\MazeMaker_Data\sfx\editor_play.wav")
+End Sub
