@@ -408,7 +408,7 @@ Sub tooltip(shp As Shape)
     ElseIf shp.Name = "item6option" Then
         Shapes("tooltip").TextFrame.TextRange.Text = gamesettings_laguange_get("collect_time")
     ElseIf shp.Name = "goalbtn" Then
-        Shapes("tooltip").TextFrame.TextRange.Text = gamesettings_laguange_get("maze_goal")
+        Shapes("tooltip").TextFrame.TextRange.Text = gamesettings_laguange_get("goal")
     ElseIf shp.Name = "savebtn" Then
         Shapes("tooltip").TextFrame.TextRange.Text = gamesettings_laguange_get("save")
     ElseIf shp.Name = "publishbtn" Then
@@ -455,7 +455,7 @@ Private Sub TextBox1_Change()
 If TextBox1.TextLength > 0 Then
 Dim i As Integer
 For i = 1 To TextBox1.TextLength
-If InStr(1, "abcdefghijklmnopqrstuvwxyzÃƒÂ¡Ãƒ ÃƒÂ£ÃƒÂ¢ÃƒÂ¤ÃƒÂ©ÃƒÂ¨ÃƒÂªÃƒÂ«ÃƒÂ­ÃƒÂ¬ÃƒÂ®ÃƒÂ¯ÃƒÂ³ÃƒÂ²ÃƒÂµÃƒÂ´ÃƒÂ¶ÃƒÂºÃƒÂ¹ÃƒÂ»ÃƒÂ¼ÃƒÂ±ÃƒÂ½ÃƒÂ¿ÃƒÂ§0123456789-_?!%$# ", LCase(Mid(TextBox1.Text, i, 1)), vbTextCompare) = 0 Then TextBox1.Text = Left(TextBox1.Text, i - 1) & Right(TextBox1.Text, Len(TextBox1.Text) - i)
+If InStr(1, "abcdefghijklmnopqrstuvwxyzÃ¡Ã Ã£Ã¢Ã¤Ã©Ã¨ÃªÃ«Ã­Ã¬Ã®Ã¯Ã³Ã²ÃµÃ´Ã¶ÃºÃ¹Ã»Ã¼Ã±Ã½Ã¿Ã§0123456789-_?!%$# ", LCase(Mid(TextBox1.Text, i, 1)), vbTextCompare) = 0 Then TextBox1.Text = Left(TextBox1.Text, i - 1) & Right(TextBox1.Text, Len(TextBox1.Text) - i)
 Next
 Shapes("btn_applytitle_cover").Visible = msoFalse
 Else
@@ -481,4 +481,3 @@ Slide18.TextBox1.Text = EQL5_GetElementValue(Slide18.mazedata.Caption, "title", 
 Slide18.TextBox1.Visible = True
 ActivePresentation.SlideShowWindow.View.GotoSlide 18
 End Sub
-
