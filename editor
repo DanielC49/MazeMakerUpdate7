@@ -152,12 +152,12 @@ If ActivePresentation.SlideShowWindow.View.CurrentShowPosition = 4 Then save
 Slide5.loadmaze curmaze.Caption
 Slide5.Shapes("startc").Left = Slide5.Shapes("start").Left - (Slide5.Shapes("startc").Width / 2) + (Slide5.Shapes("start").Width / 2)
 Slide5.Shapes("startc").Top = Slide5.Shapes("start").Top - (Slide5.Shapes("startc").Height / 2) + (Slide5.Shapes("start").Height / 2)
-ActivePresentation.SlideShowWindow.View.GotoSlide 5, msoTrue
+'ActivePresentation.SlideShowWindow.View.GotoSlide 5, msoTrue
 Pausecode (0.4)
 playSound (ActivePresentation.Path & "\MazeMaker_Data\sfx\editor_play.wav")
-SetCursorPos ((Shapes("start").Left + Shapes("start").Width / 2) * GetDpi / 72 * ActivePresentation.SlideShowWindow.View.Zoom / 100), _
+'SetCursorPos ((Shapes("start").Left + Shapes("start").Width / 2) * GetDpi / 72 * ActivePresentation.SlideShowWindow.View.Zoom / 100), _
 ((Shapes("start").Top + Shapes("start").Height / 2) * GetDpi / 72 * ActivePresentation.SlideShowWindow.View.Zoom / 100)
-If Shapes("mazetime").TextFrame.TextRange.Text <> "---" Then Slide5.starttimer
+'If Shapes("mazetime").TextFrame.TextRange.Text <> "---" Then Slide5.starttimer
 End Sub
 
 Sub save()
@@ -360,22 +360,22 @@ playSound (ActivePresentation.Path & "\MazeMaker_Data\sfx\timer_change_" & Int(R
 End Sub
 
 Sub mazegoal()
-If Shapes("mazegoal").TextFrame.TextRange.Text = "---" Then
-    Shapes("mazegoal").TextFrame.TextRange.Text = "1 " & gamesettings_laguange_get("coins")
-ElseIf Shapes("mazegoal").TextFrame.TextRange.Text = "1 " & gamesettings_laguange_get("coins") Then
-    Shapes("mazegoal").TextFrame.TextRange.Text = "2 " & gamesettings_laguange_get("coins")
-ElseIf Shapes("mazegoal").TextFrame.TextRange.Text = "2 " & gamesettings_laguange_get("coins") Then
-    Shapes("mazegoal").TextFrame.TextRange.Text = "3 " & gamesettings_laguange_get("coins")
-ElseIf Shapes("mazegoal").TextFrame.TextRange.Text = "3 " & gamesettings_laguange_get("coins") Then
-    Shapes("mazegoal").TextFrame.TextRange.Text = "5 " & gamesettings_laguange_get("coins")
-ElseIf Shapes("mazegoal").TextFrame.TextRange.Text = "5 " & gamesettings_laguange_get("coins") Then
-    Shapes("mazegoal").TextFrame.TextRange.Text = "8 " & gamesettings_laguange_get("coins")
-ElseIf Shapes("mazegoal").TextFrame.TextRange.Text = "8 " & gamesettings_laguange_get("coins") Then
-    Shapes("mazegoal").TextFrame.TextRange.Text = "10 " & gamesettings_laguange_get("coins")
-ElseIf Shapes("mazegoal").TextFrame.TextRange.Text = "10 " & gamesettings_laguange_get("coins") Then
-    Shapes("mazegoal").TextFrame.TextRange.Text = "12 " & gamesettings_laguange_get("coins")
-ElseIf Shapes("mazegoal").TextFrame.TextRange.Text = "12 " & gamesettings_laguange_get("coins") Then
-    Shapes("mazegoal").TextFrame.TextRange.Text = "---"
+If Shapes("goal").TextFrame.TextRange.Text = "---" Then
+    Shapes("goal").TextFrame.TextRange.Text = "1 " & gamesettings_laguange_get("coins")
+ElseIf Shapes("goal").TextFrame.TextRange.Text = "1 " & gamesettings_laguange_get("coins") Then
+    Shapes("goal").TextFrame.TextRange.Text = "2 " & gamesettings_laguange_get("coins")
+ElseIf Shapes("goal").TextFrame.TextRange.Text = "2 " & gamesettings_laguange_get("coins") Then
+    Shapes("goal").TextFrame.TextRange.Text = "3 " & gamesettings_laguange_get("coins")
+ElseIf Shapes("goal").TextFrame.TextRange.Text = "3 " & gamesettings_laguange_get("coins") Then
+    Shapes("goal").TextFrame.TextRange.Text = "5 " & gamesettings_laguange_get("coins")
+ElseIf Shapes("goal").TextFrame.TextRange.Text = "5 " & gamesettings_laguange_get("coins") Then
+    Shapes("goal").TextFrame.TextRange.Text = "8 " & gamesettings_laguange_get("coins")
+ElseIf Shapes("goal").TextFrame.TextRange.Text = "8 " & gamesettings_laguange_get("coins") Then
+    Shapes("goal").TextFrame.TextRange.Text = "10 " & gamesettings_laguange_get("coins")
+ElseIf Shapes("goal").TextFrame.TextRange.Text = "10 " & gamesettings_laguange_get("coins") Then
+    Shapes("goal").TextFrame.TextRange.Text = "12 " & gamesettings_laguange_get("coins")
+ElseIf Shapes("goal").TextFrame.TextRange.Text = "12 " & gamesettings_laguange_get("coins") Then
+    Shapes("goal").TextFrame.TextRange.Text = "---"
 End If
 playSound (ActivePresentation.Path & "\MazeMaker_Data\sfx\goal_change.wav")
 End Sub
@@ -455,7 +455,7 @@ Private Sub TextBox1_Change()
 If TextBox1.TextLength > 0 Then
 Dim i As Integer
 For i = 1 To TextBox1.TextLength
-If InStr(1, "abcdefghijklmnopqrstuvwxyzÃ¡Ã Ã£Ã¢Ã¤Ã©Ã¨ÃªÃ«Ã­Ã¬Ã®Ã¯Ã³Ã²ÃµÃ´Ã¶ÃºÃ¹Ã»Ã¼Ã±Ã½Ã¿Ã§0123456789-_?!%$# ", LCase(Mid(TextBox1.Text, i, 1)), vbTextCompare) = 0 Then TextBox1.Text = Left(TextBox1.Text, i - 1) & Right(TextBox1.Text, Len(TextBox1.Text) - i)
+If InStr(1, "abcdefghijklmnopqrstuvwxyzÃ¡Ã Ã£Ã¢Ã¤Ã©Ã¨ÃªÃ«Ã­Ã¬Ã®Ã¯Ã³Ã²ÃµÃ´Ã¶ÃºÃ¹Ã»Ã¼Ã±Ã½Ã¿Ã§0123456789-_?!%$# ", LCase(Mid(TextBox1.Text, i, 1)), vbTextCompare) = 0 Then TextBox1.Text = Left(TextBox1.Text, i - 1) & Right(TextBox1.Text, Len(TextBox1.Text) - i)
 Next
 Shapes("btn_applytitle_cover").Visible = msoFalse
 Else
@@ -481,4 +481,3 @@ Slide18.TextBox1.Text = EQL5_GetElementValue(Slide18.mazedata.Caption, "title", 
 Slide18.TextBox1.Visible = True
 ActivePresentation.SlideShowWindow.View.GotoSlide 18
 End Sub
-
