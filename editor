@@ -360,22 +360,22 @@ playSound (ActivePresentation.Path & "\MazeMaker_Data\sfx\timer_change_" & Int(R
 End Sub
 
 Sub mazegoal()
-If Shapes("maze_goal").TextFrame.TextRange.Text = "---" Then
-    Shapes("maze_goal").TextFrame.TextRange.Text = "1 " & gamesettings_laguange_get("coins")
-ElseIf Shapes("maze_goal").TextFrame.TextRange.Text = "1 " & gamesettings_laguange_get("coins") Then
-    Shapes("maze_goal").TextFrame.TextRange.Text = "2 " & gamesettings_laguange_get("coins")
-ElseIf Shapes("maze_goal").TextFrame.TextRange.Text = "2 " & gamesettings_laguange_get("coins") Then
-    Shapes("maze_goal").TextFrame.TextRange.Text = "3 " & gamesettings_laguange_get("coins")
-ElseIf Shapes("maze_goal").TextFrame.TextRange.Text = "3 " & gamesettings_laguange_get("coins") Then
-    Shapes("maze_goal").TextFrame.TextRange.Text = "5 " & gamesettings_laguange_get("coins")
-ElseIf Shapes("maze_goal").TextFrame.TextRange.Text = "5 " & gamesettings_laguange_get("coins") Then
-    Shapes("maze_goal").TextFrame.TextRange.Text = "8 " & gamesettings_laguange_get("coins")
-ElseIf Shapes("maze_goal").TextFrame.TextRange.Text = "8 " & gamesettings_laguange_get("coins") Then
-    Shapes("maze_goal").TextFrame.TextRange.Text = "10 " & gamesettings_laguange_get("coins")
-ElseIf Shapes("maze_goal").TextFrame.TextRange.Text = "10 " & gamesettings_laguange_get("coins") Then
-    Shapes("maze_goal").TextFrame.TextRange.Text = "12 " & gamesettings_laguange_get("coins")
-ElseIf Shapes("maze_goal").TextFrame.TextRange.Text = "12 " & gamesettings_laguange_get("coins") Then
-    Shapes("maze_goal").TextFrame.TextRange.Text = "---"
+If Shapes("mazegoal").TextFrame.TextRange.Text = "---" Then
+    Shapes("mazegoal").TextFrame.TextRange.Text = "1 " & gamesettings_laguange_get("coins")
+ElseIf Shapes("mazegoal").TextFrame.TextRange.Text = "1 " & gamesettings_laguange_get("coins") Then
+    Shapes("mazegoal").TextFrame.TextRange.Text = "2 " & gamesettings_laguange_get("coins")
+ElseIf Shapes("mazegoal").TextFrame.TextRange.Text = "2 " & gamesettings_laguange_get("coins") Then
+    Shapes("mazegoal").TextFrame.TextRange.Text = "3 " & gamesettings_laguange_get("coins")
+ElseIf Shapes("mazegoal").TextFrame.TextRange.Text = "3 " & gamesettings_laguange_get("coins") Then
+    Shapes("mazegoal").TextFrame.TextRange.Text = "5 " & gamesettings_laguange_get("coins")
+ElseIf Shapes("mazegoal").TextFrame.TextRange.Text = "5 " & gamesettings_laguange_get("coins") Then
+    Shapes("mazegoal").TextFrame.TextRange.Text = "8 " & gamesettings_laguange_get("coins")
+ElseIf Shapes("mazegoal").TextFrame.TextRange.Text = "8 " & gamesettings_laguange_get("coins") Then
+    Shapes("mazegoal").TextFrame.TextRange.Text = "10 " & gamesettings_laguange_get("coins")
+ElseIf Shapes("mazegoal").TextFrame.TextRange.Text = "10 " & gamesettings_laguange_get("coins") Then
+    Shapes("mazegoal").TextFrame.TextRange.Text = "12 " & gamesettings_laguange_get("coins")
+ElseIf Shapes("mazegoal").TextFrame.TextRange.Text = "12 " & gamesettings_laguange_get("coins") Then
+    Shapes("mazegoal").TextFrame.TextRange.Text = "---"
 End If
 playSound (ActivePresentation.Path & "\MazeMaker_Data\sfx\goal_change.wav")
 End Sub
