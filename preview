@@ -1,0 +1,97 @@
+Option Explicit
+
+Sub loadmaze(mmpFile As String, Optional online As Boolean = False)
+Dim shp As Shape
+For Each shp In Shapes.Range
+If Left(shp.Name, 5) = "block" Or Left(shp.Name, 4) = "coin" Or Left(shp.Name, 9) = "fullblock" Or Left(shp.Name, 11) = "dottedblock" Or Left(shp.Name, 5) = "onoff" Or Left(shp.Name, 8) = "colltime" Then shp.Delete
+Next
+
+Dim data As String
+If online Then data = mmpFile Else: data = FS_ReadFile(mmpFile)
+data = data & vbNewLine
+
+ListBox1.clear
+Dim i As Integer, str As String, newshp As Shape, sn As String
+str = data
+str = str & vbNewLine
+For i = 1 To Len(data) - Len(Replace(data, Chr(10), ""))
+    ListBox1.AddItem Replace(Mid(str, 1, InStr(1, str, Chr(10), vbTextCompare)), vbNewLine, "")
+    str = Right(str, Len(str) - Len(Mid(str, 1, InStr(1, str, Chr(10), vbTextCompare))))
+Next
+
+For i = 0 To ListBox1.ListCount - 1
+    If Left(ListBox1.List(i), 9) = "version:7" Or Left(ListBox1.List(i), 9) = "version:4" Or Replace(ListBox1.List(i), " ", "") = "" Then
+    ElseIf Left(ListBox1.List(i), 11) = "block_size:" Then
+        mazesize.Caption = Right(ListBox1.List(i), Len(ListBox1.List(i)) - 11)
+        Shapes.Range(Array("start", "finish", "shp", "shp2", "shp3", "shp5", "shp6")).Width = mazesize.Caption
+        Shapes.Range(Array("start", "finish", "shp", "shp2", "shp3", "shp5", "shp6")).Height = mazesize.Caption
+    ElseIf Left(ListBox1.List(i), 13) = "block_offset:" Then
+        mazeoffset.Caption = Right(ListBox1.List(i), Len(ListBox1.List(i)) - 13)
+    ElseIf Left(ListBox1.List(i), 11) = "dark_color:" Then
+        Shapes("shp").Fill.ForeColor.RGB = Right(ListBox1.List(i), Len(ListBox1.List(i)) - 11)
+        Shapes("mazeborder").Fill.ForeColor.RGB = Shapes("shp").Fill.ForeColor.RGB
+        Background.Fill.ForeColor.RGB = Shapes("shp").Fill.ForeColor.RGB
+        For Each shp In Slide5.Shapes.Range: If Left(shp.Name, 5) = "block" Or Left(shp.Name, 4) = "coin" Then shp.Fill.ForeColor.RGB = Shapes("shp").Fill.ForeColor.RGB
+        Next
+    ElseIf Left(ListBox1.List(i), 12) = "light_color:" Then
+        Shapes("bg").Fill.ForeColor.RGB = Right(ListBox1.List(i), Len(ListBox1.List(i)) - 12)
+    ElseIf Left(ListBox1.List(i), 5) = "goal:" Then
+        If Right(ListBox1.List(i), Len(ListBox1.List(i)) - 5) = "---" Then
+            Shapes("goal_msg").Visible = msoFalse
+        Else
+            Shapes("goal_msg").TextFrame.TextRange.Text = gamesettings_laguange_get("goal") & ": " & Right(ListBox1.List(i), Len(ListBox1.List(i)) - 5) & " " & gamesettings_laguange_get("coins")
+            Shapes("goal_msg").Visible = msoTrue
+        End If
+    ElseIf Left(ListBox1.List(i), 6) = "start:" Then
+        Shapes("start").Left = Mid(ListBox1.List(i), 7, InStr(1, ListBox1.List(i), ",") - 7)
+        Shapes("start").Top = Right(ListBox1.List(i), InStr(1, StrReverse(ListBox1.List(i)), ",") - 1)
+    ElseIf Left(ListBox1.List(i), 7) = "finish:" Then
+        Shapes("finish").Left = Mid(ListBox1.List(i), 8, InStr(1, ListBox1.List(i), ",") - 8)
+        Shapes("finish").Top = Right(ListBox1.List(i), InStr(1, StrReverse(ListBox1.List(i)), ",") - 1)
+    ElseIf Left(ListBox1.List(i), 6) = "_block" Then
+        sn = Replace(ListBox1.List(i), "_", "")
+        Shapes("shp").Duplicate.Name = Left(sn, InStr(1, sn, ":") - 1)
+        Set newshp = Shapes(Left(sn, InStr(1, sn, ":") - 1))
+        newshp.Left = Mid(sn, InStr(1, sn, ":") + 1, InStr(1, sn, ",") - InStr(1, sn, ":") - 1)
+        newshp.Top = Right(sn, InStr(1, StrReverse(sn), ",") - 1)
+    ElseIf Left(ListBox1.List(i), 5) = "_coin" Then
+        sn = Replace(ListBox1.List(i), "_", "")
+        Shapes("shp2").Duplicate.Name = Left(sn, InStr(1, sn, ":") - 1)
+        Set newshp = Shapes(Left(sn, InStr(1, sn, ":") - 1))
+        newshp.Left = Mid(sn, InStr(1, sn, ":") + 1, InStr(1, sn, ",") - InStr(1, sn, ":") - 1)
+        newshp.Top = Right(sn, InStr(1, StrReverse(sn), ",") - 1)
+    ElseIf Left(ListBox1.List(i), 10) = "_fullblock" Then
+        sn = Replace(ListBox1.List(i), "_", "")
+        Shapes("shp3").Duplicate.Name = Left(sn, InStr(1, sn, ":") - 1)
+        Set newshp = Shapes(Left(sn, InStr(1, sn, ":") - 1))
+        newshp.Left = Mid(sn, InStr(1, sn, ":") + 1, InStr(1, sn, ",") - InStr(1, sn, ":") - 1)
+        newshp.Top = Right(sn, InStr(1, StrReverse(sn), ",") - 1)
+        newshp.Fill.UserPicture ActivePresentation.Path & "\MazeMaker_Data\sprites\fullblock.gif"
+    ElseIf Left(ListBox1.List(i), 12) = "_dottedblock" Then
+        sn = Replace(ListBox1.List(i), "_", "")
+        Shapes("shp3").Duplicate.Name = Left(sn, InStr(1, sn, ":") - 1)
+        Set newshp = Shapes(Left(sn, InStr(1, sn, ":") - 1))
+        newshp.Left = Mid(sn, InStr(1, sn, ":") + 1, InStr(1, sn, ",") - InStr(1, sn, ":") - 1)
+        newshp.Top = Right(sn, InStr(1, StrReverse(sn), ",") - 1)
+        newshp.Fill.UserPicture ActivePresentation.Path & "\MazeMaker_Data\sprites\dottedblock.png"
+    ElseIf Left(ListBox1.List(i), 6) = "_onoff" Then
+        sn = Replace(ListBox1.List(i), "_", "")
+        Shapes("shp5").Duplicate.Name = Left(sn, InStr(1, sn, ":") - 1)
+        Set newshp = Shapes(Left(sn, InStr(1, sn, ":") - 1))
+        newshp.Left = Mid(sn, InStr(1, sn, ":") + 1, InStr(1, sn, ",") - InStr(1, sn, ":") - 1)
+        newshp.Top = Right(sn, InStr(1, StrReverse(sn), ",") - 1)
+    ElseIf Left(ListBox1.List(i), 9) = "_colltime" Then
+        sn = Replace(ListBox1.List(i), "_", "")
+        Shapes("shp6").Duplicate.Name = Left(sn, InStr(1, sn, ":") - 1)
+        Set newshp = Shapes(Left(sn, InStr(1, sn, ":") - 1))
+        newshp.Left = Mid(sn, InStr(1, sn, ":") + 1, InStr(1, sn, ",") - InStr(1, sn, ":") - 1)
+        newshp.Top = Right(sn, InStr(1, StrReverse(sn), ",") - 1)
+    End If
+Next
+
+Shapes.Range(Array("start", "finish", "goal_msg")).ZOrder msoBringToFront
+End Sub
+
+Private Sub CommandButton1_Click()
+MsgBox Shapes("goal_msg").Height
+End Sub
