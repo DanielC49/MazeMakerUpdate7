@@ -408,7 +408,7 @@ Sub tooltip(shp As Shape)
     ElseIf shp.Name = "item6option" Then
         Shapes("tooltip").TextFrame.TextRange.Text = gamesettings_laguange_get("collect_time")
     ElseIf shp.Name = "goalbtn" Then
-        Shapes("tooltip").TextFrame.TextRange.Text = gamesettings_laguange_get("maze_goal")
+        Shapes("tooltip").TextFrame.TextRange.Text = gamesettings_laguange_get("goal")
     ElseIf shp.Name = "savebtn" Then
         Shapes("tooltip").TextFrame.TextRange.Text = gamesettings_laguange_get("save")
     ElseIf shp.Name = "publishbtn" Then
