@@ -17,7 +17,7 @@ data = FS_ReadFile(mmpFile)
 data = data & vbNewLine
 
 ListBox1.clear
-Dim i As Integer, str As String, newshp As Shape, sn As String, concoins As Boolean
+Dim i As Integer, str As String, newshp As Shape, sn As String
 str = data
 str = str & vbNewLine
 For i = 1 To Len(data) - Len(Replace(data, Chr(10), ""))
@@ -26,19 +26,13 @@ For i = 1 To Len(data) - Len(Replace(data, Chr(10), ""))
 Next
 
 For i = 0 To ListBox1.ListCount - 1
-    If Left(ListBox1.List(i), 9) = "version:7" Or Replace(ListBox1.List(i), " ", "") = "" Then
+    If Left(ListBox1.List(i), 9) = "version:7" Or Left(ListBox1.List(i), 9) = "version:4" Or Replace(ListBox1.List(i), " ", "") = "" Then
     ElseIf Left(ListBox1.List(i), 6) = "title:" Then
         Shapes("mazetitle").TextFrame.TextRange.Text = Right(ListBox1.List(i), Len(ListBox1.List(i)) - 6)
     ElseIf Left(ListBox1.List(i), 11) = "block_size:" Then
         mazesize.Caption = Right(ListBox1.List(i), Len(ListBox1.List(i)) - 11)
-        Shapes("shp").Width = mazesize.Caption
-        Shapes("shp").Height = mazesize.Caption
-        Shapes("shp2").Width = mazesize.Caption
-        Shapes("shp2").Height = mazesize.Caption
-        Shapes("start").Width = mazesize.Caption
-        Shapes("start").Height = mazesize.Caption
-        Shapes("finish").Width = mazesize.Caption
-        Shapes("finish").Height = mazesize.Caption
+        Shapes.Range(Array("start", "finish", "shp", "shp2", "shp3", "shp5", "shp6")).Width = mazesize.Caption
+        Shapes.Range(Array("start", "finish", "shp", "shp2", "shp3", "shp5", "shp6")).Height = mazesize.Caption
     ElseIf Left(ListBox1.List(i), 13) = "block_offset:" Then
         mazeoffset.Caption = Right(ListBox1.List(i), Len(ListBox1.List(i)) - 13)
     ElseIf Left(ListBox1.List(i), 11) = "dark_color:" Then
@@ -90,7 +84,6 @@ For i = 0 To ListBox1.ListCount - 1
         Set newshp = Shapes(Left(sn, InStr(1, sn, ":") - 1))
         newshp.Left = Mid(sn, InStr(1, sn, ":") + 1, InStr(1, sn, ",") - InStr(1, sn, ":") - 1)
         newshp.Top = Right(sn, InStr(1, StrReverse(sn), ",") - 1)
-        If concoins = False Then concoins = True
     ElseIf Left(ListBox1.List(i), 10) = "_fullblock" Then
         sn = Replace(ListBox1.List(i), "_", "")
         Shapes("shp3").Duplicate.Name = Left(sn, InStr(1, sn, ":") - 1)
@@ -104,7 +97,7 @@ For i = 0 To ListBox1.ListCount - 1
         Set newshp = Shapes(Left(sn, InStr(1, sn, ":") - 1))
         newshp.Left = Mid(sn, InStr(1, sn, ":") + 1, InStr(1, sn, ",") - InStr(1, sn, ":") - 1)
         newshp.Top = Right(sn, InStr(1, StrReverse(sn), ",") - 1)
-        newshp.Fill.UserPicture ActivePresentation.Path & "\MazeMaker_Data\sprites\dottedblock.png"
+        newshp.Fill.UserPicture ActivePresentation.Path & "\MazeMaker_Data\sprites\fullblock.gif"
     ElseIf Left(ListBox1.List(i), 6) = "_onoff" Then
         sn = Replace(ListBox1.List(i), "_", "")
         Shapes("shp5").Duplicate.Name = Left(sn, InStr(1, sn, ":") - 1)
@@ -122,23 +115,23 @@ For i = 0 To ListBox1.ListCount - 1
         End
     End If
 Next
-If concoins Then
-    Shapes("ncoin").Visible = msoTrue
-    Shapes("ncoins").Visible = msoTrue
-    Shapes("ncoins").TextFrame.TextRange.Text = "0"
-Else
-    Shapes("ncoin").Visible = msoFalse
-    Shapes("ncoins").Visible = msoFalse
-End If
+
+Shapes("ncoins").TextFrame.TextRange.Text = "0"
 Shapes.Range(Array("start", "finish", "cover")).ZOrder msoBringToFront
 Shapes("cover").Visible = msoFalse
+ActivePresentation.SlideShowWindow.View.GotoSlide 5
+SetCursorPos ((Shapes("start").Left + Shapes("start").Width / 2) * GetDpi / 72 * ActivePresentation.SlideShowWindow.View.Zoom / 100), _
+((Shapes("start").Top + Shapes("start").Height / 2) * GetDpi / 72 * ActivePresentation.SlideShowWindow.View.Zoom / 100)
+If mazetime > 0 Then starttimer
+
+For Each shp In Shapes.Range
+    If Left(shp.Name, 11) = "dottedblock" Then shp.Fill.UserPicture ActivePresentation.Path & "\MazeMaker_Data\sprites\dottedblock.png"
+Next
 End Sub
 
 Sub starttimer()
     Dim tick As Boolean, t0 As Single, t As Single
     tick = False
-    Shapes("db").TextFrame.TextRange.Text = time
-    Pausecode (0.5)
     t0 = timer
     Do While Shapes("cover").Visible = msoFalse And ActivePresentation.SlideShowWindow.View.CurrentShowPosition = 5
         t = mazetime - timer + t0
@@ -219,7 +212,7 @@ Sub onoff_click()
             shp.Fill.UserPicture ActivePresentation.Path & "\MazeMaker_Data\sprites\dottedblock.png"
         ElseIf Left(shp.Name, 11) = "dottedblock" Then
             shp.Name = Replace(shp.Name, "dottedblock", "fullblock")
-            shp.Fill.UserPicture ActivePresentation.Path & "\MazeMaker_Data\sprites\fullblock.png"
+            shp.Fill.UserPicture ActivePresentation.Path & "\MazeMaker_Data\sprites\fullblock.gif"
         End If
     Next
     playSound ActivePresentation.Path & "\MazeMaker_Data\sfx\switch_blocks.wav"
