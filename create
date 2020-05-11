@@ -1,0 +1,79 @@
+Option Explicit
+
+Private Sub TextBox1_Change()
+If TextBox1.TextLength > 0 Then
+Dim i As Integer
+For i = 1 To TextBox1.TextLength
+If InStr(1, "abcdefghijklmnopqrstuvwxyzáàãâäéèêëíìîïóòõôöúùûüñýÿç0123456789-_?!%$# ", LCase(Mid(TextBox1.Text, i, 1)), vbTextCompare) = 0 Then TextBox1.Text = Left(TextBox1.Text, i - 1) & Right(TextBox1.Text, Len(TextBox1.Text) - i)
+Next
+Shapes("btncover").Visible = msoFalse
+Else
+Shapes("btncover").Visible = msoTrue
+End If
+End Sub
+
+Private Sub TextBox1_GotFocus()
+Shapes("tb").Line.ForeColor.RGB = RGB(180, 180, 180)
+End Sub
+
+Private Sub TextBox1_LostFocus()
+Shapes("tb").Line.ForeColor.RGB = RGB(210, 210, 210)
+End Sub
+
+Sub sizeclick(shp As Shape)
+Shapes("sizesel").Left = shp.Left
+Dim snd As String
+If shp.Name = "80,40" Then snd = "1"
+If shp.Name = "40,0" Then snd = "2"
+If shp.Name = "20,0" Then snd = "3"
+playSound (ActivePresentation.Path & "\MazeMaker_Data\sfx\editor_block_place_" & snd & ".wav")
+selsize.Caption = shp.Name
+End Sub
+
+Sub createmaze()
+If TextBox1.Text <> "" Then
+Dim shp As Shape
+Set shp = Shapes(selsize.Caption)
+Dim data As String
+data = "version:7" & vbNewLine & "title:" & TextBox1.Text & vbNewLine & "dark_color:0" & vbNewLine & "light_color:16777215" & vbNewLine & _
+"time:---" & vbNewLine & "block_size:" & Left(shp.Name, InStr(1, shp.Name, ",") - 1) & vbNewLine & "block_offset:" & StrReverse(Left(StrReverse(shp.Name), InStr(1, StrReverse(shp.Name), ",") - 1)) & vbNewLine & _
+"start:40,120" & vbNewLine & "finish:120,120"
+FS_ExportFile ActivePresentation.Path & "\MazeMaker_Data\saves\" & TextBox1.Text & ".mmp", data
+Slide4.mazesize.Caption = Left(shp.Name, InStr(1, shp.Name, ",") - 1)
+Slide4.mazeoffset.Caption = StrReverse(Left(StrReverse(shp.Name), InStr(1, StrReverse(shp.Name), ",") - 1))
+Slide4.Shapes("shp").Width = Slide4.mazesize.Caption
+Slide4.Shapes("shp").Height = Slide4.mazesize.Caption
+Slide4.Shapes("shp2").Width = Slide4.mazesize.Caption
+Slide4.Shapes("shp2").Height = Slide4.mazesize.Caption
+Slide4.Shapes("shp3").Width = Slide4.mazesize.Caption
+Slide4.Shapes("shp3").Height = Slide4.mazesize.Caption
+Slide4.Shapes("start").Width = Slide4.mazesize.Caption
+Slide4.Shapes("start").Height = Slide4.mazesize.Caption
+Slide4.Shapes("finish").Width = Slide4.mazesize.Caption
+Slide4.Shapes("finish").Height = Slide4.mazesize.Caption
+Slide4.Shapes("start").Left = 40
+Slide4.Shapes("start").Top = 120
+Slide4.Shapes("finish").Left = 120
+Slide4.Shapes("finish").Top = 120
+If Slide4.Shapes("grid20").Visible Or Slide4.Shapes("grid40").Visible Or Slide4.Shapes("grid80").Visible Then
+Slide4.Shapes("grid20").Visible = msoFalse
+Slide4.Shapes("grid40").Visible = msoFalse
+Slide4.Shapes("grid80").Visible = msoFalse
+Slide4.Shapes("grid" & Slide4.mazesize.Caption).Visible = msoTrue
+End If
+Slide4.Shapes("mazetime").TextFrame.TextRange.Text = "---"
+Slide4.Shapes("mazecolor1").Fill.ForeColor.RGB = 0
+Slide4.Shapes("mazecolor2").Fill.ForeColor.RGB = 16777215
+Slide4.Shapes("shp").Fill.ForeColor.RGB = 0
+Slide4.Shapes("shp2").Fill.ForeColor.RGB = 0
+Slide4.Shapes("mazetitle").TextFrame.TextRange.Text = TextBox1.Text
+Slide4.Shapes("mazeborder").Fill.ForeColor.RGB = 0
+Slide4.Shapes("bg").Fill.ForeColor.RGB = 16777215
+Slide4.Clear
+Slide4.curmaze.Caption = ActivePresentation.Path & "\MazeMaker_Data\saves\" & TextBox1.Text & ".mmp"
+TextBox1.Text = ""
+Shapes("sizesel").Left = Shapes("40,0").Left
+selsize.Caption = "40,0"
+ActivePresentation.SlideShowWindow.View.GotoSlide 3, msoTrue
+End If
+End Sub
