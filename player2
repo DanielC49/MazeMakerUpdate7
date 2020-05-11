@@ -11,12 +11,13 @@ Dim shp As Shape
 For Each shp In Shapes.Range
 If Left(shp.Name, 5) = "block" Or Left(shp.Name, 4) = "coin" Or Left(shp.Name, 9) = "fullblock" Or Left(shp.Name, 11) = "dottedblock" Or Left(shp.Name, 5) = "onoff" Or Left(shp.Name, 8) = "colltime" Then shp.Delete
 Next
+Shapes("goal_msg").Visible = msoFalse
 
 Dim data As String
 data = FS_ReadFile(mmpFile)
 data = data & vbNewLine
 
-ListBox1.clear
+ListBox1.Clear
 Dim i As Integer, str As String, newshp As Shape, sn As String
 str = data
 str = str & vbNewLine
@@ -253,3 +254,4 @@ Slide19.Shapes("startc").Top = Slide19.Shapes("start").Top - (Slide19.Shapes("st
 'data = FS_ReadFile(ActivePresentation.Path & "\MazeMaker_Data\online\cache_recent_maze_" & Slide19.curmazeid.Caption & ".mmp")
 'If EQL5_GetElementValue(FS_ReadFile(ActivePresentation.Path & "\MazeMaker_Data\online\cache_recent_maze_" & Slide19.curmazeid.Caption & ".mmp"), "time", "", "", , "", "", vbNewLine) <> "---" Then Slide19.starttimer
 End Sub
+
