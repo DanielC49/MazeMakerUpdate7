@@ -11,12 +11,13 @@ Dim shp As Shape
 For Each shp In Slide5.Shapes.Range
 If Left(shp.Name, 5) = "block" Or Left(shp.Name, 4) = "coin" Or Left(shp.Name, 9) = "fullblock" Or Left(shp.Name, 11) = "dottedblock" Or Left(shp.Name, 5) = "onoff" Or Left(shp.Name, 8) = "colltime" Then shp.Delete
 Next
+Shapes("goal_msg").Visible = msoFalse
 
 Dim data As String
 data = FS_ReadFile(mmpFile)
 data = data & vbNewLine
 
-ListBox1.clear
+ListBox1.Clear
 Dim i As Integer, str As String, newshp As Shape, sn As String
 str = data
 str = str & vbNewLine
@@ -122,11 +123,12 @@ Shapes("cover").Visible = msoFalse
 ActivePresentation.SlideShowWindow.View.GotoSlide 5
 SetCursorPos ((Shapes("start").Left + Shapes("start").Width / 2) * GetDpi / 72 * ActivePresentation.SlideShowWindow.View.Zoom / 100), _
 ((Shapes("start").Top + Shapes("start").Height / 2) * GetDpi / 72 * ActivePresentation.SlideShowWindow.View.Zoom / 100)
-If mazetime > 0 Then starttimer
 
 For Each shp In Shapes.Range
     If Left(shp.Name, 11) = "dottedblock" Then shp.Fill.UserPicture ActivePresentation.Path & "\MazeMaker_Data\sprites\dottedblock.png"
 Next
+
+If mazetime > 0 Then starttimer
 End Sub
 
 Sub starttimer()
@@ -224,12 +226,7 @@ End Sub
 
 Sub finish_hover()
     If val(Shapes("ncoins").TextFrame.TextRange.Text) >= mazegoal Then
-        If Shapes("ncoins").Visible = msoTrue Then
-            Slide7.Shapes("collectedcoins").Visible = msoTrue
-            Slide7.Shapes("collectedcoins").TextFrame.TextRange.Text = gamesettings_laguange_get("coins_collected") & ": " & Shapes("ncoins").TextFrame.TextRange.Text
-        Else
-            Slide7.Shapes("collectedcoins").Visible = msoFalse
-        End If
+        Slide7.Shapes("collectedcoins").TextFrame.TextRange.Text = gamesettings_laguange_get("coins_collected") & ": " & Shapes("ncoins").TextFrame.TextRange.Text
         playSound (ActivePresentation.Path & "\MazeMaker_Data\sfx\game_win_transition.wav")
         ActivePresentation.SlideShowWindow.View.GotoSlide 7, msoTrue
     End If
@@ -239,3 +236,4 @@ Sub editmaze()
 ActivePresentation.SlideShowWindow.View.GotoSlide 3, msoTrue
 playSound (ActivePresentation.Path & "\MazeMaker_Data\sfx\editor_play.wav")
 End Sub
+
