@@ -77,7 +77,7 @@ End If
 shp.Delete
 End Sub
 
-Sub clear()
+Sub Clear()
 playSound (ActivePresentation.Path & "\MazeMaker_Data\sfx\editor_maze_clear.wav")
 Dim shp As Shape
 For Each shp In Slide4.Shapes.Range
@@ -187,89 +187,130 @@ Shapes("cover").Visible = msoFalse
 End Sub
 
 Sub importmaze(mmpFile As String)
-clear
-
-Dim data As String
-data = FS_ReadFile(mmpFile)
-
-ListBox1.clear
-Dim i As Integer
-Dim str As String
-Dim newshp As Shape
-Dim sn As String
-Dim concoins As Boolean
-str = data
-str = str & vbNewLine
-For i = 1 To Len(data) - Len(Replace(data, Chr(10), ""))
-ListBox1.AddItem Replace(Mid(str, 1, InStr(1, str, Chr(10), vbTextCompare)), vbNewLine, "")
-str = Right(str, Len(str) - Len(Mid(str, 1, InStr(1, str, Chr(10), vbTextCompare))))
-Next
-
-For i = 0 To ListBox1.ListCount - 1
-If Left(ListBox1.List(i), 9) = "version:4" Then
-ElseIf Left(ListBox1.List(i), 6) = "title:" Then
-Shapes("mazetitle").TextFrame.TextRange.Text = Right(ListBox1.List(i), Len(ListBox1.List(i)) - 6)
-ElseIf Left(ListBox1.List(i), 11) = "block_size:" Then
-mazesize.Caption = Right(ListBox1.List(i), Len(ListBox1.List(i)) - 11)
-Shapes("shp").Width = mazesize.Caption
-Shapes("shp").Height = mazesize.Caption
-Shapes("shp2").Width = mazesize.Caption
-Shapes("shp2").Height = mazesize.Caption
-Shapes("shp3").Width = mazesize.Caption
-Shapes("shp3").Height = mazesize.Caption
-Shapes("start").Width = mazesize.Caption
-Shapes("start").Height = mazesize.Caption
-Shapes("finish").Width = mazesize.Caption
-Shapes("finish").Height = mazesize.Caption
-If Slide4.Shapes("grid20").Visible Or Slide4.Shapes("grid40").Visible Or Slide4.Shapes("grid80").Visible Then
-Slide4.Shapes("grid20").Visible = msoFalse
-Slide4.Shapes("grid40").Visible = msoFalse
-Slide4.Shapes("grid80").Visible = msoFalse
-Slide4.Shapes("grid" & Slide4.mazesize.Caption).Visible = msoTrue
-End If
-ElseIf Left(ListBox1.List(i), 13) = "block_offset:" Then
-mazeoffset.Caption = Right(ListBox1.List(i), Len(ListBox1.List(i)) - 13)
-ElseIf Left(ListBox1.List(i), 11) = "dark_color:" Then
-Shapes("shp").Fill.ForeColor.RGB = Right(ListBox1.List(i), Len(ListBox1.List(i)) - 11)
-Shapes("mazeborder").Fill.ForeColor.RGB = Shapes("shp").Fill.ForeColor.RGB
-Shapes("mazecolor1").Fill.ForeColor.RGB = Right(ListBox1.List(i), Len(ListBox1.List(i)) - 11)
-Dim shp As Shape
-For Each shp In Slide5.Shapes.Range: If Left(shp.Name, 5) = "block" Or Left(shp.Name, 4) = "coin" Then shp.Fill.ForeColor.RGB = Shapes("shp").Fill.ForeColor.RGB
-Next
-ElseIf Left(ListBox1.List(i), 12) = "light_color:" Then
-Shapes("bg").Fill.ForeColor.RGB = Right(ListBox1.List(i), Len(ListBox1.List(i)) - 12)
-Shapes("mazecolor2").Fill.ForeColor.RGB = Right(ListBox1.List(i), Len(ListBox1.List(i)) - 12)
-ElseIf Left(ListBox1.List(i), 5) = "time:" Then
-If Right(ListBox1.List(i), Len(ListBox1.List(i)) - 5) = "---" Then
-Shapes("mazetime").TextFrame.TextRange.Text = "---"
-Else
-Shapes("mazetime").TextFrame.TextRange.Text = Right(ListBox1.List(i), Len(ListBox1.List(i)) - 5) & " " & gamesettings_laguange_get("mazetime_suffix")
-End If
-ElseIf Left(ListBox1.List(i), 6) = "start:" Then
-Shapes("start").Left = Mid(ListBox1.List(i), 7, InStr(1, ListBox1.List(i), ",") - 7)
-Shapes("start").Top = Right(ListBox1.List(i), InStr(1, StrReverse(ListBox1.List(i)), ",") - 1)
-ElseIf Left(ListBox1.List(i), 7) = "finish:" Then
-Shapes("finish").Left = Mid(ListBox1.List(i), 8, InStr(1, ListBox1.List(i), ",") - 8)
-Shapes("finish").Top = Right(ListBox1.List(i), InStr(1, StrReverse(ListBox1.List(i)), ",") - 1)
-ElseIf Left(ListBox1.List(i), 6) = "_block" Then
-sn = Replace(ListBox1.List(i), "_", "")
-Shapes("shp").Duplicate.Name = Left(sn, InStr(1, sn, ":") - 1)
-Set newshp = Shapes(Left(sn, InStr(1, sn, ":") - 1))
-newshp.Left = Mid(sn, InStr(1, sn, ":") + 1, InStr(1, sn, ",") - InStr(1, sn, ":") - 1)
-newshp.Top = Right(sn, InStr(1, StrReverse(sn), ",") - 1)
-ElseIf Left(ListBox1.List(i), 5) = "_coin" Then
-sn = Replace(ListBox1.List(i), "_", "")
-Shapes("shp3").Duplicate.Name = Left(sn, InStr(1, sn, ":") - 1)
-Set newshp = Shapes(Left(sn, InStr(1, sn, ":") - 1))
-newshp.Left = Mid(sn, InStr(1, sn, ":") + 1, InStr(1, sn, ",") - InStr(1, sn, ":") - 1)
-newshp.Top = Right(sn, InStr(1, StrReverse(sn), ",") - 1)
-If concoins = False Then concoins = True
-Else
-MsgBox "Error, unknown: " & ListBox1.List(i)
-End If
-Next
-Shapes("start").ZOrder (msoBringToFront)
-Shapes("finish").ZOrder (msoBringToFront)
+    Clear
+    
+    Dim data As String
+    data = FS_ReadFile(mmpFile)
+    
+    ListBox1.Clear
+    Dim i As Integer
+    Dim str As String
+    Dim newshp As Shape
+    Dim sn As String
+    Dim concoins As Boolean
+    str = data
+    str = str & vbNewLine
+    For i = 1 To Len(data) - Len(Replace(data, Chr(10), ""))
+        ListBox1.AddItem Replace(Mid(str, 1, InStr(1, str, Chr(10), vbTextCompare)), vbNewLine, "")
+        str = Right(str, Len(str) - Len(Mid(str, 1, InStr(1, str, Chr(10), vbTextCompare))))
+    Next
+    
+    Shapes("mazegoal").TextFrame.TextRange.Text = "---"
+    
+    For i = 0 To ListBox1.ListCount - 1
+        If Left(ListBox1.List(i), 9) = "version:4" Or Left(ListBox1.List(i), 9) = "version:7" Then
+        ElseIf Left(ListBox1.List(i), 6) = "title:" Then
+            Shapes("mazetitle").TextFrame.TextRange.Text = Right(ListBox1.List(i), Len(ListBox1.List(i)) - 6)
+        ElseIf Left(ListBox1.List(i), 11) = "block_size:" Then
+            mazesize.Caption = Right(ListBox1.List(i), Len(ListBox1.List(i)) - 11)
+            Shapes("shp").Width = mazesize.Caption
+            Shapes("shp").Height = mazesize.Caption
+            Shapes("shp2").Width = mazesize.Caption
+            Shapes("shp2").Height = mazesize.Caption
+            Shapes("shp3").Width = mazesize.Caption
+            Shapes("shp3").Height = mazesize.Caption
+            Shapes("shp4").Width = mazesize.Caption
+            Shapes("shp4").Height = mazesize.Caption
+            Shapes("shp5").Width = mazesize.Caption
+            Shapes("shp5").Height = mazesize.Caption
+            Shapes("shp6").Width = mazesize.Caption
+            Shapes("shp6").Height = mazesize.Caption
+            Shapes("shp7").Width = mazesize.Caption
+            Shapes("shp7").Height = mazesize.Caption
+            Shapes("start").Width = mazesize.Caption
+            Shapes("start").Height = mazesize.Caption
+            Shapes("finish").Width = mazesize.Caption
+            Shapes("finish").Height = mazesize.Caption
+            If Slide4.Shapes("grid20").Visible Or Slide4.Shapes("grid40").Visible Or Slide4.Shapes("grid80").Visible Then
+                Slide4.Shapes("grid20").Visible = msoFalse
+                Slide4.Shapes("grid40").Visible = msoFalse
+                Slide4.Shapes("grid80").Visible = msoFalse
+                Slide4.Shapes("grid" & Slide4.mazesize.Caption).Visible = msoTrue
+            End If
+        ElseIf Left(ListBox1.List(i), 13) = "block_offset:" Then
+            mazeoffset.Caption = Right(ListBox1.List(i), Len(ListBox1.List(i)) - 13)
+        ElseIf Left(ListBox1.List(i), 11) = "dark_color:" Then
+            Shapes("shp").Fill.ForeColor.RGB = Right(ListBox1.List(i), Len(ListBox1.List(i)) - 11)
+            Shapes("mazeborder").Fill.ForeColor.RGB = Shapes("shp").Fill.ForeColor.RGB
+            Shapes("mazecolor1").Fill.ForeColor.RGB = Right(ListBox1.List(i), Len(ListBox1.List(i)) - 11)
+            Dim shp As Shape
+            For Each shp In Slide5.Shapes.Range: If Left(shp.Name, 5) = "block" Or Left(shp.Name, 4) = "coin" Then shp.Fill.ForeColor.RGB = Shapes("shp").Fill.ForeColor.RGB
+            Next
+        ElseIf Left(ListBox1.List(i), 12) = "light_color:" Then
+            Shapes("bg").Fill.ForeColor.RGB = Right(ListBox1.List(i), Len(ListBox1.List(i)) - 12)
+            Shapes("mazecolor2").Fill.ForeColor.RGB = Right(ListBox1.List(i), Len(ListBox1.List(i)) - 12)
+        ElseIf Left(ListBox1.List(i), 5) = "time:" Then
+            If Right(ListBox1.List(i), Len(ListBox1.List(i)) - 5) = "---" Then
+                Shapes("mazetime").TextFrame.TextRange.Text = "---"
+            Else
+                Shapes("mazetime").TextFrame.TextRange.Text = Right(ListBox1.List(i), Len(ListBox1.List(i)) - 5) & " " & gamesettings_laguange_get("mazetime_suffix")
+            End If
+        ElseIf Left(ListBox1.List(i), 5) = "goal:" Then
+            If Right(ListBox1.List(i), Len(ListBox1.List(i)) - 5) = "---" Then
+                Shapes("mazegoal").TextFrame.TextRange.Text = "---"
+            Else
+                Shapes("mazegoal").TextFrame.TextRange.Text = Right(ListBox1.List(i), Len(ListBox1.List(i)) - 5) & " " & gamesettings_laguange_get("coins")
+            End If
+        ElseIf Left(ListBox1.List(i), 6) = "start:" Then
+            Shapes("start").Left = Mid(ListBox1.List(i), 7, InStr(1, ListBox1.List(i), ",") - 7)
+            Shapes("start").Top = Right(ListBox1.List(i), InStr(1, StrReverse(ListBox1.List(i)), ",") - 1)
+        ElseIf Left(ListBox1.List(i), 7) = "finish:" Then
+            Shapes("finish").Left = Mid(ListBox1.List(i), 8, InStr(1, ListBox1.List(i), ",") - 8)
+            Shapes("finish").Top = Right(ListBox1.List(i), InStr(1, StrReverse(ListBox1.List(i)), ",") - 1)
+        ElseIf Left(ListBox1.List(i), 6) = "_block" Then
+            sn = Replace(ListBox1.List(i), "_", "")
+            Shapes("shp").Duplicate.Name = Left(sn, InStr(1, sn, ":") - 1)
+            Set newshp = Shapes(Left(sn, InStr(1, sn, ":") - 1))
+            newshp.Left = Mid(sn, InStr(1, sn, ":") + 1, InStr(1, sn, ",") - InStr(1, sn, ":") - 1)
+            newshp.Top = Right(sn, InStr(1, StrReverse(sn), ",") - 1)
+        ElseIf Left(ListBox1.List(i), 12) = "_dottedblock" Then
+            sn = Replace(ListBox1.List(i), "_", "")
+            Shapes("shp5").Duplicate.Name = Left(sn, InStr(1, sn, ":") - 1)
+            Set newshp = Shapes(Left(sn, InStr(1, sn, ":") - 1))
+            newshp.Left = Mid(sn, InStr(1, sn, ":") + 1, InStr(1, sn, ",") - InStr(1, sn, ":") - 1)
+            newshp.Top = Right(sn, InStr(1, StrReverse(sn), ",") - 1)
+        ElseIf Left(ListBox1.List(i), 10) = "_fullblock" Then
+            sn = Replace(ListBox1.List(i), "_", "")
+            Shapes("shp4").Duplicate.Name = Left(sn, InStr(1, sn, ":") - 1)
+            Set newshp = Shapes(Left(sn, InStr(1, sn, ":") - 1))
+            newshp.Left = Mid(sn, InStr(1, sn, ":") + 1, InStr(1, sn, ",") - InStr(1, sn, ":") - 1)
+            newshp.Top = Right(sn, InStr(1, StrReverse(sn), ",") - 1)
+        ElseIf Left(ListBox1.List(i), 9) = "_colltime" Then
+            sn = Replace(ListBox1.List(i), "_", "")
+            Shapes("shp7").Duplicate.Name = Left(sn, InStr(1, sn, ":") - 1)
+            Set newshp = Shapes(Left(sn, InStr(1, sn, ":") - 1))
+            newshp.Left = Mid(sn, InStr(1, sn, ":") + 1, InStr(1, sn, ",") - InStr(1, sn, ":") - 1)
+            newshp.Top = Right(sn, InStr(1, StrReverse(sn), ",") - 1)
+        ElseIf Left(ListBox1.List(i), 6) = "_onoff" Then
+            sn = Replace(ListBox1.List(i), "_", "")
+            Shapes("shp6").Duplicate.Name = Left(sn, InStr(1, sn, ":") - 1)
+            Set newshp = Shapes(Left(sn, InStr(1, sn, ":") - 1))
+            newshp.Left = Mid(sn, InStr(1, sn, ":") + 1, InStr(1, sn, ",") - InStr(1, sn, ":") - 1)
+            newshp.Top = Right(sn, InStr(1, StrReverse(sn), ",") - 1)
+        ElseIf Left(ListBox1.List(i), 5) = "_coin" Then
+            sn = Replace(ListBox1.List(i), "_", "")
+            Shapes("shp3").Duplicate.Name = Left(sn, InStr(1, sn, ":") - 1)
+            Set newshp = Shapes(Left(sn, InStr(1, sn, ":") - 1))
+            newshp.Left = Mid(sn, InStr(1, sn, ":") + 1, InStr(1, sn, ",") - InStr(1, sn, ":") - 1)
+            newshp.Top = Right(sn, InStr(1, StrReverse(sn), ",") - 1)
+            If concoins = False Then concoins = True
+        Else
+            MsgBox "Error, unknown: " & ListBox1.List(i)
+            End
+        End If
+        Next
+        Shapes("start").ZOrder (msoBringToFront)
+        Shapes("finish").ZOrder (msoBringToFront)
 End Sub
 
 Sub grid_onoff()
@@ -455,7 +496,7 @@ Private Sub TextBox1_Change()
 If TextBox1.TextLength > 0 Then
 Dim i As Integer
 For i = 1 To TextBox1.TextLength
-If InStr(1, "abcdefghijklmnopqrstuvwxyzÃ¡Ã Ã£Ã¢Ã¤Ã©Ã¨ÃªÃ«Ã­Ã¬Ã®Ã¯Ã³Ã²ÃµÃ´Ã¶ÃºÃ¹Ã»Ã¼Ã±Ã½Ã¿Ã§0123456789-_?!%$# ", LCase(Mid(TextBox1.Text, i, 1)), vbTextCompare) = 0 Then TextBox1.Text = Left(TextBox1.Text, i - 1) & Right(TextBox1.Text, Len(TextBox1.Text) - i)
+If InStr(1, "abcdefghijklmnopqrstuvwxyzÃƒÂ¡Ãƒ ÃƒÂ£ÃƒÂ¢ÃƒÂ¤ÃƒÂ©ÃƒÂ¨ÃƒÂªÃƒÂ«ÃƒÂ­ÃƒÂ¬ÃƒÂ®ÃƒÂ¯ÃƒÂ³ÃƒÂ²ÃƒÂµÃƒÂ´ÃƒÂ¶ÃƒÂºÃƒÂ¹ÃƒÂ»ÃƒÂ¼ÃƒÂ±ÃƒÂ½ÃƒÂ¿ÃƒÂ§0123456789-_?!%$# ", LCase(Mid(TextBox1.Text, i, 1)), vbTextCompare) = 0 Then TextBox1.Text = Left(TextBox1.Text, i - 1) & Right(TextBox1.Text, Len(TextBox1.Text) - i)
 Next
 Shapes("btn_applytitle_cover").Visible = msoFalse
 Else
@@ -481,3 +522,4 @@ Slide18.TextBox1.Text = EQL5_GetElementValue(Slide18.mazedata.Caption, "title", 
 Slide18.TextBox1.Visible = True
 ActivePresentation.SlideShowWindow.View.GotoSlide 18
 End Sub
+
