@@ -5,12 +5,13 @@ Dim shp As Shape
 For Each shp In Shapes.Range
 If Left(shp.Name, 5) = "block" Or Left(shp.Name, 4) = "coin" Or Left(shp.Name, 9) = "fullblock" Or Left(shp.Name, 11) = "dottedblock" Or Left(shp.Name, 5) = "onoff" Or Left(shp.Name, 8) = "colltime" Then shp.Delete
 Next
+Shapes("goal_msg").Visible = msoFalse
 
 Dim data As String
 If online Then data = mmpFile Else: data = FS_ReadFile(mmpFile)
 data = data & vbNewLine
 
-ListBox1.clear
+ListBox1.Clear
 Dim i As Integer, str As String, newshp As Shape, sn As String
 str = data
 str = str & vbNewLine
