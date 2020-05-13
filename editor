@@ -479,18 +479,6 @@ If Replace(Replace(shp.Name, "block", ""), "coin", "") = ShapeName Then ShapeExi
 Next
 End Function
 
-Private Sub CommandButton1_Click()
-MsgBox Shapes("a").Left
-End Sub
-
-Private Sub CommandButton3_Click()
-play
-End Sub
-
-Private Sub CommandButton4_Click()
-play
-End Sub
-
 Private Sub TextBox1_Change()
 If TextBox1.TextLength > 0 Then
 Dim i As Integer
