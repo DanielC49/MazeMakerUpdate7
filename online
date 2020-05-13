@@ -257,10 +257,6 @@ Sub addmazeitem(ByVal title As String, ByVal mazetime As String, ByVal author_us
     End If
 End Sub
 
-Private Sub Label1_Click()
-
-End Sub
-
 Private Sub ScrollBar1_Change()
     refresh_mazeitemspos
 End Sub
