@@ -67,7 +67,7 @@ For i = 0 To ListBox1.ListCount - 1
         Set newshp = Shapes(Left(sn, InStr(1, sn, ":") - 1))
         newshp.Left = Mid(sn, InStr(1, sn, ":") + 1, InStr(1, sn, ",") - InStr(1, sn, ":") - 1)
         newshp.Top = Right(sn, InStr(1, StrReverse(sn), ",") - 1)
-        newshp.Fill.UserPicture ActivePresentation.Path & "\MazeMaker_Data\sprites\fullblock.gif"
+        newshp.Fill.UserPicture ActivePresentation.Path & "\MazeMaker_Data\sprites\fullblock.png"
     ElseIf Left(ListBox1.List(i), 12) = "_dottedblock" Then
         sn = Replace(ListBox1.List(i), "_", "")
         Shapes("shp3").Duplicate.Name = Left(sn, InStr(1, sn, ":") - 1)
@@ -91,8 +91,4 @@ For i = 0 To ListBox1.ListCount - 1
 Next
 
 Shapes.Range(Array("start", "finish", "goal_msg")).ZOrder msoBringToFront
-End Sub
-
-Private Sub CommandButton1_Click()
-MsgBox Shapes("goal_msg").Height
 End Sub
