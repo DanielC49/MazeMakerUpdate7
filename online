@@ -145,13 +145,11 @@ Sub maze_option_click(shp As Shape)
         Shapes("savedmaze_g").Visible = msoTrue
     
     ElseIf shp.Name = "btn_play" Then
-        Slide19.loadmaze ActivePresentation.Path & "\MazeMaker_Data\online\cache_recent_maze_" & mazeid & ".mmp"
         Slide19.Shapes("author_username").TextFrame.TextRange.Text = EQL5_GetElementValue(FS_ReadFile(ActivePresentation.Path & "\MazeMaker_Data\online\cache_recent_mazes_author"), mazeid & "_username")
         Slide19.Shapes("author_profilepicture").Fill.UserPicture EQL5_GetElementValue(FS_ReadFile(ActivePresentation.Path & "\MazeMaker_Data\online\cache_recent_mazes_author"), mazeid & "_profilepicture")
-        Slide19.Shapes("startc").Left = Slide19.Shapes("start").Left - (Slide19.Shapes("startc").Width / 2) + (Slide19.Shapes("start").Width / 2)
-        Slide19.Shapes("startc").Top = Slide19.Shapes("start").Top - (Slide19.Shapes("startc").Height / 2) + (Slide19.Shapes("start").Height / 2)
         Slide19.curmazeid.Caption = mazeid
         Slide9.Shapes("cover").Visible = msoFalse
+        Slide19.loadmaze ActivePresentation.Path & "\MazeMaker_Data\online\cache_recent_maze_" & mazeid & ".mmp"
     End If
 
 Exit Sub
@@ -288,7 +286,8 @@ Private Sub TextBox1_Change()
     If TextBox1.TextLength > 0 Then
         Dim i As Integer
         For i = 1 To TextBox1.TextLength
-            If InStr(1, "abcdefghijklmnopqrstuvwxyzÃ¡Ã Ã£Ã¢Ã¤Ã©Ã¨ÃªÃ«Ã­Ã¬Ã®Ã¯Ã³Ã²ÃµÃ´Ã¶ÃºÃ¹Ã»Ã¼Ã±Ã½Ã¿Ã§0123456789 ", LCase(Mid(TextBox1.Text, i, 1)), vbTextCompare) = 0 Then TextBox1.Text = Left(TextBox1.Text, i - 1) & Right(TextBox1.Text, Len(TextBox1.Text) - i)
+            If InStr(1, "abcdefghijklmnopqrstuvwxyzÃƒÂ¡ÃƒÂ ÃƒÂ£ÃƒÂ¢ÃƒÂ¤ÃƒÂ©ÃƒÂ¨ÃƒÂªÃƒÂ«ÃƒÂ­ÃƒÂ¬ÃƒÂ®ÃƒÂ¯ÃƒÂ³ÃƒÂ²ÃƒÂµÃƒÂ´ÃƒÂ¶ÃƒÂºÃƒÂ¹ÃƒÂ»ÃƒÂ¼ÃƒÂ±ÃƒÂ½ÃƒÂ¿ÃƒÂ§0123456789 ", LCase(Mid(TextBox1.Text, i, 1)), vbTextCompare) = 0 Then TextBox1.Text = Left(TextBox1.Text, i - 1) & Right(TextBox1.Text, Len(TextBox1.Text) - i)
         Next
     End If
 End Sub
+
