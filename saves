@@ -1,0 +1,147 @@
+Option Explicit
+
+Sub importmaze()
+Dim str As String
+str = FS_OpenFileDialog("Maze Maker Project", ".mmp", gamesettings_laguange_get("import"), gamesettings_laguange_get("import_maze"), ActivePresentation.Path & "\")
+If str <> "" Then
+FileCopy str, ActivePresentation.Path & "\MazeMaker_Data\saves\" & StrReverse(Left(StrReverse(str), InStr(1, StrReverse(str), "\") - 1))
+refresh_mazedir
+End If
+End Sub
+
+Sub refresh_mazedir()
+On Error GoTo handler
+ScrollBar1.Enabled = msoFalse
+Shapes("saves_background_theme").MediaFormat.Muted = True
+Shapes("nores").Visible = msoFalse
+Shapes("cover").Visible = msoTrue
+Shapes("refreshbtn").Visible = msoFalse
+clearmazedir
+Dim FileSystem As Object
+Dim HostFolder As String
+HostFolder = ActivePresentation.Path & "\MazeMaker_Data\saves\"
+Set FileSystem = CreateObject("Scripting.FileSystemObject")
+DoFolder FileSystem.GetFolder(HostFolder)
+
+Exit Sub
+handler: MsgBox error, vbCritical, "MazeMaker"
+game_createerrorlog "saves_refresh" & vbNewLine & "Details:" & vbNewLine & Err & vbNewLine & error
+End Sub
+
+Sub DoFolder(Folder)
+Dim SubFolder
+For Each SubFolder In Folder.SubFolders
+DoFolder SubFolder
+Next
+Dim File
+
+For Each File In Folder.Files
+'Replace(StrReverse(Left(StrReverse(File), InStr(1, StrReverse(File), "\") - 1)), ".mmp", "")
+If Right(File, 4) = ".mmp" Then addmazeitem EQL5_GetElementValue(FS_ReadFile(File & ""), "title", "", "", , "", "", vbNewLine), File & ""
+Next
+ScrollBar1.value = 0
+If val(Label1.Caption) > 4 Then
+ScrollBar1.Enabled = True
+ScrollBar1.Max = val(Label1.Caption) * 96.5
+End If
+If Label1.Caption = "0" Then
+Shapes("nores").Visible = msoTrue
+End If
+Shapes("refreshbtn").Visible = msoTrue
+Shapes("saves_background_theme").MediaFormat.Muted = False
+Shapes("cover").Visible = msoFalse
+Shapes("_title").TextFrame.TextRange.Text = gamesettings_laguange_get("saved_mazes") & " (" & Label1.Caption & ")"
+End Sub
+
+Sub addmazeitem(title As String, datafile As String)
+Label1.Caption = val(Label1.Caption) + 1
+Slide16.loadmaze datafile
+Slide16.Export ActivePresentation.Path & "\MazeMaker_Data\cache\maze" & Label1.Caption & ".jpg", "JPG"
+Shapes("maze").Duplicate.Name = "maze" & Label1.Caption
+Shapes("maze" & Label1.Caption).Ungroup
+Dim shp As Shape
+Set shp = Shapes.Range(Array(Shapes.Count - 15, Shapes.Count - 14, Shapes.Count - 13, Shapes.Count - 12, Shapes.Count - 11, Shapes.Count - 10, Shapes.Count - 9, Shapes.Count - 8, Shapes.Count - 7, Shapes.Count - 6, _
+Shapes.Count - 5, Shapes.Count - 4, Shapes.Count - 3, Shapes.Count - 2, Shapes.Count - 1, Shapes.Count)).Group
+shp.Name = "maze" & Label1.Caption
+shp.GroupItems("path").TextFrame.TextRange.Text = datafile
+shp.GroupItems("title").TextFrame.TextRange.Text = title
+shp.GroupItems("preview").Fill.UserPicture ActivePresentation.Path & "\MazeMaker_Data\cache\maze" & Label1.Caption & ".jpg"
+shp.GroupItems("preview").PictureFormat.Crop.PictureWidth = 377.0029
+shp.GroupItems("preview").PictureFormat.Crop.PictureHeight = 206.9294
+shp.GroupItems("preview").PictureFormat.Crop.PictureOffsetX = 0
+shp.GroupItems("preview").PictureFormat.Crop.PictureOffsetY = -19.84307
+shp.ZOrder (msoSendToBack)
+If val(Label1.Caption) / 2 <> Int(Label1.Caption / 2) Then
+Shapes("maze" & Label1.Caption).Left = 83
+Shapes("maze" & Label1.Caption).Top = 110 * val(Label1.Caption) - 20
+Else
+Shapes("maze" & Label1.Caption).Left = 523
+Shapes("maze" & Label1.Caption).Top = 110 * (val(Label1.Caption) - 1) - 20
+End If
+End Sub
+
+Sub clearmazedir()
+Label1.Caption = "0"
+Dim shp As Shape
+For Each shp In Shapes.Range: If Left(shp.Name, 4) = "maze" And Len(shp.Name) > 4 Then shp.Delete
+Next
+End Sub
+
+Sub mazeoptionclick(shp As Shape)
+    On Error GoTo handler
+    If shp.Name = "edit" Then
+        Slide4.importmaze shp.ParentGroup.GroupItems("path").TextFrame.TextRange.Text
+        Slide4.curmaze.Caption = shp.ParentGroup.GroupItems("path").TextFrame.TextRange.Text
+        ActivePresentation.SlideShowWindow.View.GotoSlide 3, msoTrue
+    ElseIf shp.Name = "play" Then
+        Slide4.importmaze shp.ParentGroup.GroupItems("path").TextFrame.TextRange.Text
+        Slide4.curmaze.Caption = shp.ParentGroup.GroupItems("path").TextFrame.TextRange.Text
+        Slide5.loadmaze shp.ParentGroup.GroupItems("path").TextFrame.TextRange.Text
+        Slide5.Shapes("startc").Left = Slide5.Shapes("start").Left - (Slide5.Shapes("startc").Width / 2) + (Slide5.Shapes("start").Width / 2)
+        Slide5.Shapes("startc").Top = Slide5.Shapes("start").Top - (Slide5.Shapes("startc").Height / 2) + (Slide5.Shapes("start").Height / 2)
+        playSound (ActivePresentation.Path & "\MazeMaker_Data\sfx\editor_play.wav")
+    ElseIf shp.Name = "remove" Then
+        FS_DeleteFile shp.ParentGroup.GroupItems("path").TextFrame.TextRange.Text
+        refresh_mazedir
+    ElseIf shp.Name = "publish" Then
+        Slide18.mazedata.Caption = shp.ParentGroup.GroupItems("path").TextFrame.TextRange.Text
+        Slide18.Shapes("pubbox").Visible = msoTrue
+        Slide18.Shapes("hint").Visible = msoFalse
+        Slide18.Shapes("game_txt_select_maze").Visible = msoFalse
+        Slide16.loadmaze Slide18.mazedata.Caption
+        Slide18.mazedata.Caption = FS_ReadFile(Slide18.mazedata.Caption)
+        Slide16.Export ActivePresentation.Path & "\MazeMaker_Data\cache\uploadmaze.jpg", "JPG"
+        Slide18.Shapes("preview").Fill.UserPicture ActivePresentation.Path & "\MazeMaker_Data\cache\uploadmaze.jpg"
+        Slide18.Shapes("preview").PictureFormat.Crop.PictureWidth = 377.0029
+        Slide18.Shapes("preview").PictureFormat.Crop.PictureHeight = 206.9294
+        Slide18.Shapes("preview").PictureFormat.Crop.PictureOffsetX = 0
+        Slide18.Shapes("preview").PictureFormat.Crop.PictureOffsetY = -19.84307
+        Slide18.TextBox1.Text = EQL5_GetElementValue(Slide18.mazedata.Caption, "title", "", "", , "", "", vbNewLine)
+        Slide18.TextBox1.Visible = True
+        ActivePresentation.SlideShowWindow.View.GotoSlide 18
+    End If
+Exit Sub
+handler:     MsgBox Err & vbNewLine & error
+game_createerrorlog "saves_option_click option=" & shp.Name & vbNewLine & "Details:" & vbNewLine & Err & vbNewLine & error
+End Sub
+
+Private Sub ScrollBar1_Change()
+refresh_mazeitemspos
+End Sub
+
+Private Sub ScrollBar1_Scroll()
+refresh_mazeitemspos
+End Sub
+
+Sub refresh_mazeitemspos()
+Dim shp As Shape
+For Each shp In Shapes.Range
+If Left(shp.Name, 4) = "maze" And Len(shp.Name) > 4 Then
+If val(Replace(shp.Name, "maze", "")) / 2 <> Int(Replace(shp.Name, "maze", "") / 2) Then
+shp.Top = (110 * val(Replace(shp.Name, "maze", "")) - 20) - (ScrollBar1.value)
+Else
+shp.Top = (110 * (val(Replace(shp.Name, "maze", "")) - 1) - 20) - (ScrollBar1.value)
+End If
+End If
+Next
+End Sub
