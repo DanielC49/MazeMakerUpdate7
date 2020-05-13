@@ -237,3 +237,4 @@ ActivePresentation.SlideShowWindow.View.GotoSlide 3, msoTrue
 playSound (ActivePresentation.Path & "\MazeMaker_Data\sfx\editor_play.wav")
 End Sub
 
+
