@@ -1,0 +1,124 @@
+Option Explicit
+
+Sub Online_SendCommand(cmd)
+    WebBrowser1.Document.parentWindow.execScript "document.getElementsByTagName(""iframe"")[0].contentWindow.postMessage(""" & cmd & """, ""*"")", "JScript"
+End Sub
+
+Sub uploadmaze_publish()
+    On Error GoTo handler
+    Shapes("cover").Visible = msoTrue
+    Shapes("loading_g").Visible = msoTrue
+    Shapes("game_txt_select_maze").Visible = msoFalse
+    Shapes("pubbox").Visible = msoFalse
+    Shapes("btncover").Visible = msoFalse
+    Shapes("db").TextFrame.TextRange.Text = timer
+    DoEvents
+    TextBox1.Visible = False
+    ActivePresentation.SlideShowWindow.View.ResetSlideTime
+    WebBrowser1.Navigate "https://pptgamespt.wixsite.com/pptg-online/api?serverid=b017243e-c4ad-4c61-ab80-2621ad847375"
+    Do Until WebBrowser1.ReadyState = READYSTATE_COMPLETE: Shapes("db").TextFrame.TextRange.Text = timer: DoEvents: Loop
+    Do Until WebBrowser1.Document.getElementById("comp-k9fntwau").textContent = "ready": Shapes("db").TextFrame.TextRange.Text = timer: DoEvents: Loop
+    Online_SendCommand "execute_script c176ae95-b914-4c97-82ee-fc4da985902c true uploadMaze \""" & TextBox1.Text & "\"" \""" & Replace(mazedata.Caption, vbNewLine, "\\\\n") & _
+    "\"" \""" & Mid(mazedata.Caption, InStr(1, mazedata.Caption, "time:") + 5, InStr(InStr(1, mazedata.Caption, "time:"), mazedata.Caption, vbNewLine) - 5 - InStr(1, mazedata.Caption, "time:")) & "\"""
+    Do While WebBrowser1.Document.getElementById("comp-k9fntwau").textContent = "ready": Shapes("db").TextFrame.TextRange.Text = timer: DoEvents: Loop
+    Do While WebBrowser1.Document.getElementById("comp-k9fntwau").textContent = "waiting": Shapes("db").TextFrame.TextRange.Text = timer: DoEvents: Loop
+    If WebBrowser1.Document.getElementById("comp-k9fntwau").textContent = "not logged" Then
+        ActivePresentation.SlideShowWindow.View.GotoSlide 23
+        uploadmaze_reset
+        Slide23.WebBrowser1.Navigate "https://pptgamespt.wixsite.com/pptg-online/sign-in?env=game"
+        Slide23.Label1.Caption = "Loading"
+    ElseIf WebBrowser1.Document.getElementById("comp-k9fntwau").textContent = "done" Then
+        Slide18.Shapes("success_g").Visible = msoTrue
+    Else
+        Shapes("loading_g").Visible = msoFalse
+        Shapes("error_g").Visible = msoTrue
+        Shapes("error_g").GroupItems("title").TextFrame.TextRange.Text = gamesettings_laguange_get("unknown_error_code")
+        Shapes("error_g").GroupItems("desc").TextFrame.TextRange.Text = gamesettings_laguange_get("contact_support")
+        FS_ExportFile ActivePresentation.Path & "\MazeMaker_Data\errorlogs\" & Date$ & " " & " " & Hour(time) & " " & Minute(time) & " " & Second(time) & ".log", "online_upload_maze_publish:unknown_reponse" & vbNewLine & WebBrowser1.Document.getElementById("comp-k9fntwau").innerText
+    End If
+    
+Exit Sub
+handler:
+game_createerrorlog "upload_maze_publish" & vbNewLine & "Details" & vbNewLine & "Number: " & Err.Number & vbNewLine & "Description: " & Err.Description
+Shapes("loading_g").Visible = msoFalse
+Shapes("error_g").Visible = msoTrue
+Shapes("error_g").GroupItems("title").TextFrame.TextRange.Text = gamesettings_laguange_get("unexpected_error")
+Shapes("error_g").GroupItems("desc").TextFrame.TextRange.Text = gamesettings_laguange_get("contact_support")
+End Sub
+
+Sub select_maze()
+    mazedata.Caption = FS_OpenFileDialog("Maze Maker Projects", ".mmp", gamesettings_laguange_get("select"), gamesettings_laguange_get("select_maze"), ActivePresentation.Path & "\MazeMaker_Data\saves\")
+    If mazedata.Caption <> "" Then
+        Shapes("pubbox").Visible = msoTrue
+        Shapes("hint").Visible = msoFalse
+        Shapes("game_txt_select_maze").Visible = msoFalse
+        Slide16.loadmaze mazedata.Caption
+        mazedata.Caption = FS_ReadFile(mazedata.Caption)
+        Slide16.Export ActivePresentation.Path & "\MazeMaker_Data\cache\uploadmaze.jpg", "JPG"
+        Shapes("preview").Fill.UserPicture ActivePresentation.Path & "\MazeMaker_Data\cache\uploadmaze.jpg"
+        Shapes("preview").PictureFormat.Crop.PictureWidth = 377.0029
+        Shapes("preview").PictureFormat.Crop.PictureHeight = 206.9294
+        Shapes("preview").PictureFormat.Crop.PictureOffsetX = 0
+        Shapes("preview").PictureFormat.Crop.PictureOffsetY = -19.84307
+        TextBox1.Text = EQL5_GetElementValue(mazedata.Caption, "title", "", "", , "", "", vbNewLine)
+        TextBox1.Visible = True
+        ActivePresentation.SlideShowWindow.View.ResetSlideTime
+    End If
+End Sub
+
+Sub uploadmaze_success_close()
+Slide18.Shapes("success_g").Visible = msoFalse
+Slide18.Shapes("cover").Visible = msoFalse
+uploadmaze_reset
+End Sub
+
+Sub uploadmaze_error_close()
+Shapes("cover").Visible = msoFalse
+Shapes("error_g").Visible = msoFalse
+Shapes("pubbox").Visible = msoTrue
+TextBox1.Visible = True
+ActivePresentation.SlideShowWindow.View.ResetSlideTime
+End Sub
+
+Sub uploadmaze_reset()
+Shapes("cover").Visible = msoFalse
+Shapes("error_g").Visible = msoFalse
+Shapes("loading_g").Visible = msoFalse
+Shapes("pubbox").Visible = msoFalse
+Shapes("hint").Visible = msoTrue
+Shapes("game_txt_select_maze").Visible = msoTrue
+Shapes("btncover").Visible = msoFalse
+TextBox1.Visible = False
+ActivePresentation.SlideShowWindow.View.ResetSlideTime
+End Sub
+
+Sub uploadmaze_cancel()
+Shapes("cover").Visible = msoFalse
+Shapes("loading_g").Visible = msoFalse
+Shapes("pubbox").Visible = msoTrue
+TextBox1.Visible = True
+ActivePresentation.SlideShowWindow.View.ResetSlideTime
+End
+End Sub
+
+Sub uploadmaze_goback()
+If ActivePresentation.SlideShowWindow.View.LastSlideViewed.SlideIndex = 10 Then
+gamegoto_saves
+ElseIf ActivePresentation.SlideShowWindow.View.LastSlideViewed.SlideIndex = 4 Then
+ActivePresentation.SlideShowWindow.View.GotoSlide 3, msoTrue
+Else
+gamegoto_mazemakeronline
+End If
+End Sub
+
+Private Sub TextBox1_Change()
+If TextBox1.TextLength > 0 Then
+Dim i As Integer
+For i = 1 To TextBox1.TextLength
+If InStr(1, "abcdefghijklmnopqrstuvwxyzáàãâäéèêëíìîïóòõôöúùûüñýÿç0123456789-_?!%$# ", LCase(Mid(TextBox1.Text, i, 1)), vbTextCompare) = 0 Then TextBox1.Text = Left(TextBox1.Text, i - 1) & Right(TextBox1.Text, Len(TextBox1.Text) - i)
+Next
+Shapes("btncover").Visible = msoFalse
+Else
+Shapes("btncover").Visible = msoTrue
+End If
+End Sub
