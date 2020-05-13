@@ -47,10 +47,10 @@ Sub showLoading()
 End Sub
 
 Sub refresh()
-    'On Error GoTo handler
+    On Error GoTo handler
     Shapes("loading_msg").TextFrame.TextRange.Text = "Fetching content..."
     ' execute_script <file-id> <sync> <function> [parameter1] [parameter2] [...]
-    Online_SendCommand "execute_script c176ae95-b914-4c97-82ee-fc4da985902c true returnMazes 1"
+    Online_SendCommand "execute_script c176ae95-b914-4c97-82ee-fc4da985902c true returnMazes " & curpage.Caption & " \""" & TextBox1.Text & "\"""
     Do While WebBrowser1.Document.getElementById("comp-k9fntwau").textContent = "ready": DoEvents: Loop
     Do While WebBrowser1.Document.getElementById("comp-k9fntwau").textContent = "waiting": DoEvents: Loop
     Shapes("loading_msg").TextFrame.TextRange.Text = "Loading content..."
@@ -59,7 +59,7 @@ Sub refresh()
     Shapes("loading_msg").TextFrame.TextRange.Text = "---"
     Shapes("loading_g").Visible = msoFalse
     Shapes("cover").Visible = msoFalse
-    ScrollBar1.Value = 0
+    ScrollBar1.value = 0
     If val(Label1.Caption) > 2 Then ScrollBar1.Max = val(Label1.Caption) * 100
     ScrollBar1.Visible = msoTrue
     Shapes("currentmazes").TextFrame.TextRange.Text = gamesettings_laguange_get("recent_uploaded_mazes")
@@ -75,70 +75,30 @@ Sub refresh()
     Shapes("background_blured").ZOrder msoSendToBack
     Shapes("background").ZOrder msoSendToBack
     
-'Exit Sub
-'handler:     MsgBox "!ERROR: " & error
-'game_createerrorlog "online_refresh" & vbNewLine & "Details:" & vbNewLine & Err & vbNewLine & error
+Exit Sub
+handler:     MsgBox "!ERROR: " & error
+game_createerrorlog "online_refresh" & vbNewLine & "Details:" & vbNewLine & Err & vbNewLine & error
 End Sub
 
-Sub refresh_old()
-    On Error GoTo handler
-    Shapes("online_background_theme").Visible = msoFalse
-    Shapes("currentmazes").Visible = msoFalse
-    Shapes("currentpage_g").Visible = msoFalse
-    Shapes("game_txt_online_no_results").Visible = msoFalse
-    Shapes("db").TextFrame.TextRange.Text = time
-    ScrollBar1.Visible = msoFalse
-    ActivePresentation.SlideShowWindow.View.ResetSlideTime
-    Shapes("cover").Visible = msoTrue
-    Shapes("loading_g").Visible = msoTrue
-    Shapes("loading_msg").TextFrame.TextRange.Text = "..."
-    Label1.Caption = "0"
-    Dim shp As Shape
-    For Each shp In Shapes.Range
-        If Left(shp.Name, 4) = "maze" And Len(shp.Name) > 4 Then shp.Delete
-    Next
+Sub refresh_btn()
+    exploremazes
+    DoEvents
+    showLoading
+    DoEvents
     Shapes("loading_msg").TextFrame.TextRange.Text = "Connecting to server..."
-    WebBrowser1.Navigate "https://pptgamespt.wixsite.com/pptg-online/maze-maker?env=game&page=" & curpage.Caption
-    Shapes("loading_msg").TextFrame.TextRange.Text = "Connecting to server..."
-    Do While WebBrowser1.Busy: DoEvents: Loop
-    Shapes("loading_msg").TextFrame.TextRange.Text = "Awaiting data..."
-    Shapes("db").TextFrame.TextRange.Text = time
-    Pausecode game_getcursett("online_loading_latency")
-    Shapes("loading_msg").TextFrame.TextRange.Text = "Fetching data..."
-    Do While WebBrowser1.Document.getElementById("comp-juvje3ds").innerText = "loadingData": DoEvents: Loop 'Mazes data
-    Shapes("loading_msg").TextFrame.TextRange.Text = "Loading content..."
-    refresh_onlinemazes
-    Shapes("loading_msg").TextFrame.TextRange.Text = "Done."
-    Shapes("loading_msg").TextFrame.TextRange.Text = "---"
-    Shapes("loading_g").Visible = msoFalse
-    Shapes("cover").Visible = msoFalse
-    ScrollBar1.Value = 0
-    If val(Label1.Caption) > 2 Then ScrollBar1.Max = val(Label1.Caption) * 100
-    ScrollBar1.Visible = msoTrue
-    Shapes("currentmazes").TextFrame.TextRange.Text = gamesettings_laguange_get("recent_uploaded_mazes")
-    Shapes("currentpage_g").Visible = msoTrue
-    Shapes("online_background_theme").Visible = msoTrue
-    Shapes("refresh_g").Visible = msoTrue
-    Shapes("refresh_btn").Visible = msoTrue
-    Shapes("onlinehome_g").Visible = msoTrue
-    Shapes("onlinehome_btn").Visible = msoTrue
-    Shapes("searchmaze_g").Visible = msoTrue
-    Shapes("searchmaze_btn").Visible = msoTrue
-    Shapes("currentmazes").Visible = msoTrue
-    Shapes("background_blured").ZOrder msoSendToBack
-    Shapes("background").ZOrder msoSendToBack
-    Exit Sub
-handler:     MsgBox "!ERROR: " & error
-    game_createerrorlog "online_refresh" & vbNewLine & "Details:" & vbNewLine & Err & vbNewLine & error
+    WebBrowser1.Navigate "https://pptgamespt.wixsite.com/pptg-online/api?serverid=b017243e-c4ad-4c61-ab80-2621ad847375"
+    Do Until WebBrowser1.ReadyState = READYSTATE_COMPLETE: DoEvents: Loop
+    Do Until WebBrowser1.Document.getElementById("comp-k9fntwau").textContent = "ready": DoEvents: Loop
+    refresh
 End Sub
 
 Sub online_pagenav(shp As Shape)
     If shp.Name = "game_txt_previous_page" And curpage.Caption <> "1" Then
         curpage.Caption = curpage.Caption - 1
-        refresh
+        exploremazes
     ElseIf shp.Name = "game_txt_next_page" And curpage.Caption <> pagecount.Caption Then
         curpage.Caption = curpage.Caption + 1
-        refresh
+        exploremazes
     End If
 End Sub
 
@@ -160,11 +120,19 @@ Sub exploremazes()
     Shapes("background").ZOrder msoSendToBack
     Shapes("bgcover").Visible = msoFalse
     Shapes.Range(Array("game_txt_explore_mazes", "game_txt_upload_a_maze")).Visible = msoFalse
-    ScrollBar1.Value = 0
+    ScrollBar1.value = 0
     If val(Label1.Caption) > 2 Then ScrollBar1.Max = val(Label1.Caption) * 100
     ScrollBar1.Visible = True
     Shapes.Range(Array("online_background_theme", "refresh_g", "refresh_btn", "onlinehome_g", "onlinehome_btn", _
         "searchmaze_g", "searchmaze_btn", "currentmazes", "currentpage_g")).Visible = msoTrue
+    DoEvents
+    showLoading
+    DoEvents
+    Shapes("loading_msg").TextFrame.TextRange.Text = "Connecting to server..."
+    WebBrowser1.Navigate "https://pptgamespt.wixsite.com/pptg-online/api?serverid=b017243e-c4ad-4c61-ab80-2621ad847375"
+    Do Until WebBrowser1.ReadyState = READYSTATE_COMPLETE: DoEvents: Loop
+    Do Until WebBrowser1.Document.getElementById("comp-k9fntwau").textContent = "ready": DoEvents: Loop
+    refresh
 End Sub
 
 Sub upload()
@@ -289,6 +257,10 @@ Sub addmazeitem(ByVal title As String, ByVal mazetime As String, ByVal author_us
     End If
 End Sub
 
+Private Sub Label1_Click()
+
+End Sub
+
 Private Sub ScrollBar1_Change()
     refresh_mazeitemspos
 End Sub
@@ -302,9 +274,9 @@ Sub refresh_mazeitemspos()
     For Each shp In Shapes.Range
         If Left(shp.Name, 4) = "maze" And Len(shp.Name) > 4 Then
             If val(Replace(shp.Name, "maze", "")) / 2 <> Int(Replace(shp.Name, "maze", "") / 2) Then
-                shp.Top = (125 * val(Replace(shp.Name, "maze", "")) - 5) - (ScrollBar1.Value)
+                shp.Top = (125 * val(Replace(shp.Name, "maze", "")) - 5) - (ScrollBar1.value)
             Else
-                shp.Top = (125 * (val(Replace(shp.Name, "maze", "")) - 1) - 5) - (ScrollBar1.Value)
+                shp.Top = (125 * (val(Replace(shp.Name, "maze", "")) - 1) - 5) - (ScrollBar1.value)
             End If
         End If
     Next
@@ -332,54 +304,54 @@ Sub online_searchmaze_apply()
     Shapes("search_g").Visible = msoFalse
     TextBox1.Visible = False
     ActivePresentation.SlideShowWindow.View.ResetSlideTime
-    
     curpage.Caption = "1"
-    Shapes("online_background_theme").Visible = msoFalse
-    Shapes("currentmazes").Visible = msoFalse
-    Shapes("currentpage_g").Visible = msoFalse
-    Shapes("game_txt_online_no_results").Visible = msoFalse
-    Shapes("db").TextFrame.TextRange.Text = time
-    ScrollBar1.Visible = msoFalse
-    ActivePresentation.SlideShowWindow.View.ResetSlideTime
-    Shapes("cover").Visible = msoTrue
-    Shapes("loading_g").Visible = msoTrue
-    Shapes("loading_msg").TextFrame.TextRange.Text = "..."
-    Label1.Caption = "0"
-    Dim shp As Shape
-    For Each shp In Shapes.Range: If Left(shp.Name, 4) = "maze" And Len(shp.Name) > 4 Then shp.Delete
-    Next
-    Shapes("loading_msg").TextFrame.TextRange.Text = "Connecting to server..."
-    WebBrowser1.Navigate "https://pptgamespt.wixsite.com/pptg-online/maze-maker?env=game&search=" & TextBox1.Text & "&page=" & curpage.Caption
-    Shapes("loading_msg").TextFrame.TextRange.Text = "Connecting to server..."
-    Do While WebBrowser1.Busy: DoEvents: Loop
-    Shapes("loading_msg").TextFrame.TextRange.Text = "Awaiting data..."
-    Shapes("db").TextFrame.TextRange.Text = time
-    Pausecode game_getcursett("online_loading_latency")
-    Shapes("loading_msg").TextFrame.TextRange.Text = "Fetching data..."
-    Do While WebBrowser1.Document.getElementById("comp-juvje3ds").innerText = "loadingData": DoEvents: Loop 'Mazes data
-    Shapes("loading_msg").TextFrame.TextRange.Text = "Loading content..."
-    refresh_onlinemazes
-    Shapes("loading_msg").TextFrame.TextRange.Text = "Done."
-    Shapes("loading_msg").TextFrame.TextRange.Text = "---"
-    Shapes("loading_g").Visible = msoFalse
-    Shapes("cover").Visible = msoFalse
-    ScrollBar1.Value = 0
-    If val(Label1.Caption) > 2 Then
-        ScrollBar1.Max = val(Label1.Caption) * 100
-    End If
-    ScrollBar1.Visible = msoTrue
-    Shapes("currentmazes").TextFrame.TextRange.Text = gamesettings_laguange_get("showing_results_for") & """" & TextBox1.Text & """"
-    Shapes("online_background_theme").Visible = msoTrue
-    Shapes("currentpage_g").Visible = msoTrue
-    Shapes("refresh_g").Visible = msoTrue
-    Shapes("refresh_btn").Visible = msoTrue
-    Shapes("onlinehome_g").Visible = msoTrue
-    Shapes("onlinehome_btn").Visible = msoTrue
-    Shapes("searchmaze_g").Visible = msoTrue
-    Shapes("searchmaze_btn").Visible = msoTrue
-    Shapes("currentmazes").Visible = msoTrue
-    Shapes("background_blured").ZOrder msoSendToBack
-    Shapes("background").ZOrder msoSendToBack
+    
+'    Shapes("online_background_theme").Visible = msoFalse
+'    Shapes("currentmazes").Visible = msoFalse
+'    Shapes("currentpage_g").Visible = msoFalse
+'    Shapes("game_txt_online_no_results").Visible = msoFalse
+'    Shapes("db").TextFrame.TextRange.Text = time
+'    ScrollBar1.Visible = msoFalse
+'    ActivePresentation.SlideShowWindow.View.ResetSlideTime
+'    Shapes("cover").Visible = msoTrue
+'    Shapes("loading_g").Visible = msoTrue
+'    Shapes("loading_msg").TextFrame.TextRange.Text = "..."
+'    Label1.Caption = "0"
+'    Dim shp As Shape
+'    For Each shp In Shapes.Range: If Left(shp.Name, 4) = "maze" And Len(shp.Name) > 4 Then shp.Delete
+'    Next
+'    Shapes("loading_msg").TextFrame.TextRange.Text = "Connecting to server..."
+'    WebBrowser1.Navigate "https://pptgamespt.wixsite.com/pptg-online/maze-maker?env=game&search=" & TextBox1.Text & "&page=" & curpage.Caption
+'    Shapes("loading_msg").TextFrame.TextRange.Text = "Connecting to server..."
+'    Do While WebBrowser1.Busy: DoEvents: Loop
+'    Shapes("loading_msg").TextFrame.TextRange.Text = "Awaiting data..."
+'    Shapes("db").TextFrame.TextRange.Text = time
+'    Pausecode game_getcursett("online_loading_latency")
+'    Shapes("loading_msg").TextFrame.TextRange.Text = "Fetching data..."
+'    Do While WebBrowser1.Document.getElementById("comp-juvje3ds").innerText = "loadingData": DoEvents: Loop 'Mazes data
+'    Shapes("loading_msg").TextFrame.TextRange.Text = "Loading content..."
+'    refresh_onlinemazes
+'    Shapes("loading_msg").TextFrame.TextRange.Text = "Done."
+'    Shapes("loading_msg").TextFrame.TextRange.Text = "---"
+'    Shapes("loading_g").Visible = msoFalse
+'    Shapes("cover").Visible = msoFalse
+'    ScrollBar1.value = 0
+'    If val(Label1.Caption) > 2 Then
+'        ScrollBar1.Max = val(Label1.Caption) * 100
+'    End If
+'    ScrollBar1.Visible = msoTrue
+'    Shapes("currentmazes").TextFrame.TextRange.Text = gamesettings_laguange_get("showing_results_for") & """" & TextBox1.Text & """"
+'    Shapes("online_background_theme").Visible = msoTrue
+'    Shapes("currentpage_g").Visible = msoTrue
+'    Shapes("refresh_g").Visible = msoTrue
+'    Shapes("refresh_btn").Visible = msoTrue
+'    Shapes("onlinehome_g").Visible = msoTrue
+'    Shapes("onlinehome_btn").Visible = msoTrue
+'    Shapes("searchmaze_g").Visible = msoTrue
+'    Shapes("searchmaze_btn").Visible = msoTrue
+'    Shapes("currentmazes").Visible = msoTrue
+'    Shapes("background_blured").ZOrder msoSendToBack
+'    Shapes("background").ZOrder msoSendToBack
 
 Exit Sub
 handler: MsgBox "!ERROR: " & error
@@ -390,7 +362,8 @@ Private Sub TextBox1_Change()
     If TextBox1.TextLength > 0 Then
         Dim i As Integer
         For i = 1 To TextBox1.TextLength
-            If InStr(1, "abcdefghijklmnopqrstuvwxyzáàãâäéèêëíìîïóòõôöúùûüñýÿç0123456789 ", LCase(Mid(TextBox1.Text, i, 1)), vbTextCompare) = 0 Then TextBox1.Text = Left(TextBox1.Text, i - 1) & Right(TextBox1.Text, Len(TextBox1.Text) - i)
+            If InStr(1, "abcdefghijklmnopqrstuvwxyzÃ¡Ã Ã£Ã¢Ã¤Ã©Ã¨ÃªÃ«Ã­Ã¬Ã®Ã¯Ã³Ã²ÃµÃ´Ã¶ÃºÃ¹Ã»Ã¼Ã±Ã½Ã¿Ã§0123456789 ", LCase(Mid(TextBox1.Text, i, 1)), vbTextCompare) = 0 Then TextBox1.Text = Left(TextBox1.Text, i - 1) & Right(TextBox1.Text, Len(TextBox1.Text) - i)
         Next
     End If
 End Sub
+
