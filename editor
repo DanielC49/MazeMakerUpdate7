@@ -496,7 +496,7 @@ Private Sub TextBox1_Change()
 If TextBox1.TextLength > 0 Then
 Dim i As Integer
 For i = 1 To TextBox1.TextLength
-If InStr(1, "abcdefghijklmnopqrstuvwxyzÃƒÂ¡Ãƒ ÃƒÂ£ÃƒÂ¢ÃƒÂ¤ÃƒÂ©ÃƒÂ¨ÃƒÂªÃƒÂ«ÃƒÂ­ÃƒÂ¬ÃƒÂ®ÃƒÂ¯ÃƒÂ³ÃƒÂ²ÃƒÂµÃƒÂ´ÃƒÂ¶ÃƒÂºÃƒÂ¹ÃƒÂ»ÃƒÂ¼ÃƒÂ±ÃƒÂ½ÃƒÂ¿ÃƒÂ§0123456789-_?!%$# ", LCase(Mid(TextBox1.Text, i, 1)), vbTextCompare) = 0 Then TextBox1.Text = Left(TextBox1.Text, i - 1) & Right(TextBox1.Text, Len(TextBox1.Text) - i)
+If InStr(1, "abcdefghijklmnopqrstuvwxyzÃƒÆ’Ã‚Â¡ÃƒÆ’ ÃƒÆ’Ã‚Â£ÃƒÆ’Ã‚Â¢ÃƒÆ’Ã‚Â¤ÃƒÆ’Ã‚Â©ÃƒÆ’Ã‚Â¨ÃƒÆ’Ã‚ÂªÃƒÆ’Ã‚Â«ÃƒÆ’Ã‚Â­ÃƒÆ’Ã‚Â¬ÃƒÆ’Ã‚Â®ÃƒÆ’Ã‚Â¯ÃƒÆ’Ã‚Â³ÃƒÆ’Ã‚Â²ÃƒÆ’Ã‚ÂµÃƒÆ’Ã‚Â´ÃƒÆ’Ã‚Â¶ÃƒÆ’Ã‚ÂºÃƒÆ’Ã‚Â¹ÃƒÆ’Ã‚Â»ÃƒÆ’Ã‚Â¼ÃƒÆ’Ã‚Â±ÃƒÆ’Ã‚Â½ÃƒÆ’Ã‚Â¿ÃƒÆ’Ã‚Â§0123456789-_?!%$# ", LCase(Mid(TextBox1.Text, i, 1)), vbTextCompare) = 0 Then TextBox1.Text = Left(TextBox1.Text, i - 1) & Right(TextBox1.Text, Len(TextBox1.Text) - i)
 Next
 Shapes("btn_applytitle_cover").Visible = msoFalse
 Else
@@ -522,4 +522,3 @@ Slide18.TextBox1.Text = EQL5_GetElementValue(Slide18.mazedata.Caption, "title", 
 Slide18.TextBox1.Visible = True
 ActivePresentation.SlideShowWindow.View.GotoSlide 18
 End Sub
-
