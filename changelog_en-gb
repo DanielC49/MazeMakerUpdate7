@@ -1,8 +1,8 @@
 - Added new maze elements:
-  • Full block;
-  • Dotted block;
-  • On/off block;
-  • Collect time.
+  \ Full block;
+  \ Dotted block;
+  \ On/off block;
+  \ Collect time.
 - Added maze goal;
 - Improved Online experience;
 - A number of issues have been fixed and some improvements were made for a more pleasant experience.
