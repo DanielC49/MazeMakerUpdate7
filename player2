@@ -123,11 +123,12 @@ Shapes("cover").Visible = msoFalse
 ActivePresentation.SlideShowWindow.View.GotoSlide 19
 SetCursorPos ((Shapes("start").Left + Shapes("start").Width / 2) * GetDpi / 72 * ActivePresentation.SlideShowWindow.View.Zoom / 100), _
 ((Shapes("start").Top + Shapes("start").Height / 2) * GetDpi / 72 * ActivePresentation.SlideShowWindow.View.Zoom / 100)
-If mazetime > 0 Then starttimer
 
 For Each shp In Shapes.Range
     If Left(shp.Name, 11) = "dottedblock" Then shp.Fill.UserPicture ActivePresentation.Path & "\MazeMaker_Data\sprites\dottedblock.png"
 Next
+
+If mazetime > 0 Then starttimer
 End Sub
 
 Sub starttimer()
@@ -254,4 +255,5 @@ Slide19.Shapes("startc").Top = Slide19.Shapes("start").Top - (Slide19.Shapes("st
 'data = FS_ReadFile(ActivePresentation.Path & "\MazeMaker_Data\online\cache_recent_maze_" & Slide19.curmazeid.Caption & ".mmp")
 'If EQL5_GetElementValue(FS_ReadFile(ActivePresentation.Path & "\MazeMaker_Data\online\cache_recent_maze_" & Slide19.curmazeid.Caption & ".mmp"), "time", "", "", , "", "", vbNewLine) <> "---" Then Slide19.starttimer
 End Sub
+
 
