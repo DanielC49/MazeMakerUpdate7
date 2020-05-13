@@ -149,9 +149,9 @@ End Sub
 
 Sub play()
 If ActivePresentation.SlideShowWindow.View.CurrentShowPosition = 4 Then save
+Slide5.Shapes("startc").Left = Shapes("start").Left - (Slide5.Shapes("startc").Width / 2) + (Shapes("start").Width / 2)
+Slide5.Shapes("startc").Top = Shapes("start").Top - (Slide5.Shapes("startc").Height / 2) + (Shapes("start").Height / 2)
 Slide5.loadmaze curmaze.Caption
-Slide5.Shapes("startc").Left = Slide5.Shapes("start").Left - (Slide5.Shapes("startc").Width / 2) + (Slide5.Shapes("start").Width / 2)
-Slide5.Shapes("startc").Top = Slide5.Shapes("start").Top - (Slide5.Shapes("startc").Height / 2) + (Slide5.Shapes("start").Height / 2)
 'ActivePresentation.SlideShowWindow.View.GotoSlide 5, msoTrue
 Pausecode (0.4)
 playSound (ActivePresentation.Path & "\MazeMaker_Data\sfx\editor_play.wav")
@@ -480,11 +480,23 @@ If Replace(Replace(shp.Name, "block", ""), "coin", "") = ShapeName Then ShapeExi
 Next
 End Function
 
+Private Sub CommandButton1_Click()
+MsgBox Shapes("a").Left
+End Sub
+
+Private Sub CommandButton3_Click()
+play
+End Sub
+
+Private Sub CommandButton4_Click()
+play
+End Sub
+
 Private Sub TextBox1_Change()
 If TextBox1.TextLength > 0 Then
 Dim i As Integer
 For i = 1 To TextBox1.TextLength
-If InStr(1, "abcdefghijklmnopqrstuvwxyzÃƒÆ’Ã‚Â¡ÃƒÆ’ ÃƒÆ’Ã‚Â£ÃƒÆ’Ã‚Â¢ÃƒÆ’Ã‚Â¤ÃƒÆ’Ã‚Â©ÃƒÆ’Ã‚Â¨ÃƒÆ’Ã‚ÂªÃƒÆ’Ã‚Â«ÃƒÆ’Ã‚Â­ÃƒÆ’Ã‚Â¬ÃƒÆ’Ã‚Â®ÃƒÆ’Ã‚Â¯ÃƒÆ’Ã‚Â³ÃƒÆ’Ã‚Â²ÃƒÆ’Ã‚ÂµÃƒÆ’Ã‚Â´ÃƒÆ’Ã‚Â¶ÃƒÆ’Ã‚ÂºÃƒÆ’Ã‚Â¹ÃƒÆ’Ã‚Â»ÃƒÆ’Ã‚Â¼ÃƒÆ’Ã‚Â±ÃƒÆ’Ã‚Â½ÃƒÆ’Ã‚Â¿ÃƒÆ’Ã‚Â§0123456789-_?!%$# ", LCase(Mid(TextBox1.Text, i, 1)), vbTextCompare) = 0 Then TextBox1.Text = Left(TextBox1.Text, i - 1) & Right(TextBox1.Text, Len(TextBox1.Text) - i)
+If InStr(1, "abcdefghijklmnopqrstuvwxyzÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™ ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¤ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¨ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚ÂªÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â«ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â®ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â²ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚ÂµÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â´ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¶ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚ÂºÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¹ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â»ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¼ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â±ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â½ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â§0123456789-_?!%$# ", LCase(Mid(TextBox1.Text, i, 1)), vbTextCompare) = 0 Then TextBox1.Text = Left(TextBox1.Text, i - 1) & Right(TextBox1.Text, Len(TextBox1.Text) - i)
 Next
 Shapes("btn_applytitle_cover").Visible = msoFalse
 Else
@@ -510,3 +522,4 @@ Slide18.TextBox1.Text = EQL5_GetElementValue(Slide18.mazedata.Caption, "title", 
 Slide18.TextBox1.Visible = True
 ActivePresentation.SlideShowWindow.View.GotoSlide 18
 End Sub
+
