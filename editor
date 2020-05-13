@@ -151,10 +151,9 @@ Sub play()
 If ActivePresentation.SlideShowWindow.View.CurrentShowPosition = 4 Then save
 Slide5.Shapes("startc").Left = Shapes("start").Left - (Slide5.Shapes("startc").Width / 2) + (Shapes("start").Width / 2)
 Slide5.Shapes("startc").Top = Shapes("start").Top - (Slide5.Shapes("startc").Height / 2) + (Shapes("start").Height / 2)
+playSound (ActivePresentation.Path & "\MazeMaker_Data\sfx\editor_play.wav")
 Slide5.loadmaze curmaze.Caption
 'ActivePresentation.SlideShowWindow.View.GotoSlide 5, msoTrue
-Pausecode (0.4)
-playSound (ActivePresentation.Path & "\MazeMaker_Data\sfx\editor_play.wav")
 'SetCursorPos ((Shapes("start").Left + Shapes("start").Width / 2) * GetDpi / 72 * ActivePresentation.SlideShowWindow.View.Zoom / 100), _
 ((Shapes("start").Top + Shapes("start").Height / 2) * GetDpi / 72 * ActivePresentation.SlideShowWindow.View.Zoom / 100)
 'If Shapes("mazetime").TextFrame.TextRange.Text <> "---" Then Slide5.starttimer
