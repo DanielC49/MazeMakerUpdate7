@@ -200,7 +200,7 @@ Sub shp_hover(shp As Shape)
         End If
     ElseIf Left(shp.Name, 8) = "colltime" Then
         shp.Delete
-        mazetime = mazetime + 10
+        mazetime = mazetime + 5
         playSound (ActivePresentation.Path & "\MazeMaker_Data\sfx\collect_time.wav")
     End If
 End Sub
