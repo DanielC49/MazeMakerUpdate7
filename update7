@@ -65,8 +65,8 @@ End With
 
 ActivePresentation.SlideShowWindow.View.GotoSlide 24
 
-updateprogress 0.05, "Creating... '..\MazeMaker_Data\cache\update7'"
-MkDir ActivePresentation.Path & "\MazeMaker_Data\cache\update7"
+updateprogress 0.05, "Loading..."
+
 
 updateprogress 0.1, "Creating... '..\MazeMaker_Data\sprites'"
 MkDir ActivePresentation.Path & "\MazeMaker_Data\sprites"
