@@ -23,7 +23,7 @@ Sub showLoading()
 End Sub
 
 Sub refresh()
-    'On Error GoTo handler
+    On Error GoTo handler
     Shapes("loading_msg").TextFrame.TextRange.Text = "Fetching content..."
     ' execute_script <file-id> <sync> <function> [parameter1] [parameter2] [...]
     Online_SendCommand "execute_script c176ae95-b914-4c97-82ee-fc4da985902c true returnMazes " & curpage.Caption & " \""" & TextBox1.Text & "\"""
@@ -167,12 +167,14 @@ Sub refresh_onlinemazes()
     'For Each shp In Shapes.Range: If Left(shp.Name, 4) = "maze" And Len(shp.Name) > 4 Then shp.Delete
     'Next
     JSONOptions.UseEscapeChars = True
-    Dim i As Long, data As List
-    Set data = ParseJSON(WebBrowser1.Document.getElementById("comp-k9fntwau").textContent)
+    Dim i As Long, res As Object, data As New List
+    Set res = ParseJSON(WebBrowser1.Document.getElementById("comp-k9fntwau").textContent)
+    data.Items = res("mazes").Items
     DoEvents
     FS_ExportFile ActivePresentation.Path & "\MazeMaker_Data\online\test.txt", StringJSON(data)
     DoEvents
-    pagecount.Caption = MathCeil(data.Length / 6) 'MathCeil(val(EQL5_GetElementValue(data, "totalcount", , , "=")) / 6)
+    'pagecount.Caption = MathCeil(data.Length / 6) 'MathCeil(val(EQL5_GetElementValue(data, "totalcount", , , "=")) / 6)
+    pagecount.Caption = res("pcount")
     Shapes("currentpage").TextFrame.TextRange.Text = curpage.Caption & " " & gamesettings_laguange_get("of") & " " & pagecount.Caption
     If data.Length = 0 Then
         Shapes("game_txt_online_no_results").Visible = msoTrue
@@ -191,6 +193,7 @@ Sub refresh_onlinemazes()
 End Sub
 
 Sub addmazeitem(ByVal title As String, ByVal mazetime As String, ByVal author_username As String, ByVal author_profilepicture As String, ByVal datafile As String)
+    On Error GoTo handler
     Label1.Caption = val(Label1.Caption) + 1
     FS_ExportFile ActivePresentation.Path & "\MazeMaker_Data\online\cache_recent_maze_" & Label1.Caption & ".mmp", datafile
     FS_ExportFile ActivePresentation.Path & "\MazeMaker_Data\online\cache_recent_mazes_author", FS_ReadFile(ActivePresentation.Path & "\MazeMaker_Data\online\cache_recent_mazes_author") & vbNewLine & _
@@ -204,7 +207,6 @@ Sub addmazeitem(ByVal title As String, ByVal mazetime As String, ByVal author_us
     Shapes.Count - 5, Shapes.Count - 4, Shapes.Count - 3, Shapes.Count - 2, Shapes.Count - 1, Shapes.Count)).Group
     shp.Name = "maze" & Label1.Caption
     shp.GroupItems("title").TextFrame.TextRange.Text = title
-    Debug.Print title & ":" & Left(mazetime, 3) & ";"
     If Left(mazetime, 3) = "---" Then
         shp.GroupItems("time").Visible = msoFalse
         shp.GroupItems("time_icon").Visible = msoFalse
@@ -226,6 +228,10 @@ Sub addmazeitem(ByVal title As String, ByVal mazetime As String, ByVal author_us
         Shapes("maze" & Label1.Caption).Left = 523
         Shapes("maze" & Label1.Caption).Top = 125 * (val(Label1.Caption) - 1) - 5
     End If
+
+Exit Sub
+handler:     MsgBox "!ERROR: could not load maze data with error: " & error & vbNewLine & vbNewLine & "Please contact PPTGames."
+game_createerrorlog "online_refresh" & vbNewLine & "Details:" & vbNewLine & "could not load maze data" & vbNewLine & Err & vbNewLine & error & vbNewLine & vbNewLine & title & vbNewLine & author_username & vbNewLine & datafile
 End Sub
 
 Private Sub CommandButton1_Click()
@@ -291,7 +297,9 @@ Private Sub TextBox1_Change()
     If TextBox1.TextLength > 0 Then
         Dim i As Integer
         For i = 1 To TextBox1.TextLength
-            If InStr(1, "abcdefghijklmnopqrstuvwxyzÃƒÆ’Ã‚Â¡ÃƒÆ’Ã‚Â ÃƒÆ’Ã‚Â£ÃƒÆ’Ã‚Â¢ÃƒÆ’Ã‚Â¤ÃƒÆ’Ã‚Â©ÃƒÆ’Ã‚Â¨ÃƒÆ’Ã‚ÂªÃƒÆ’Ã‚Â«ÃƒÆ’Ã‚Â­ÃƒÆ’Ã‚Â¬ÃƒÆ’Ã‚Â®ÃƒÆ’Ã‚Â¯ÃƒÆ’Ã‚Â³ÃƒÆ’Ã‚Â²ÃƒÆ’Ã‚ÂµÃƒÆ’Ã‚Â´ÃƒÆ’Ã‚Â¶ÃƒÆ’Ã‚ÂºÃƒÆ’Ã‚Â¹ÃƒÆ’Ã‚Â»ÃƒÆ’Ã‚Â¼ÃƒÆ’Ã‚Â±ÃƒÆ’Ã‚Â½ÃƒÆ’Ã‚Â¿ÃƒÆ’Ã‚Â§0123456789 ", LCase(Mid(TextBox1.Text, i, 1)), vbTextCompare) = 0 Then TextBox1.Text = Left(TextBox1.Text, i - 1) & Right(TextBox1.Text, Len(TextBox1.Text) - i)
+            If InStr(1, "abcdefghijklmnopqrstuvwxyzáàãâäéèêëíìîïóòõôöúùûüñýÿç0123456789-_?!%$# ", LCase(Mid(TextBox1.Text, i, 1)), vbTextCompare) = 0 Then TextBox1.Text = Left(TextBox1.Text, i - 1) & Right(TextBox1.Text, Len(TextBox1.Text) - i)
         Next
     End If
 End Sub
+
+
