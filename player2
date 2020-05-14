@@ -117,6 +117,7 @@ For i = 0 To ListBox1.ListCount - 1
     End If
 Next
 
+Shapes("ncoins").TextFrame.TextRange.Text = "0"
 Slide19.Shapes("startc").Left = Slide19.Shapes("start").Left - (Slide19.Shapes("startc").Width / 2) + (Slide19.Shapes("start").Width / 2)
 Slide19.Shapes("startc").Top = Slide19.Shapes("start").Top - (Slide19.Shapes("startc").Height / 2) + (Slide19.Shapes("start").Height / 2)
 Shapes("ncoins").TextFrame.TextRange.Text = "0"
@@ -228,12 +229,7 @@ End Sub
 
 Sub finish_hover()
     If val(Shapes("ncoins").TextFrame.TextRange.Text) >= mazegoal Then
-        If Shapes("ncoins").Visible = msoTrue Then
-            Slide7.Shapes("collectedcoins").Visible = msoTrue
-            Slide7.Shapes("collectedcoins").TextFrame.TextRange.Text = gamesettings_laguange_get("coins_collected") & ": " & Shapes("ncoins").TextFrame.TextRange.Text
-        Else
-            Slide7.Shapes("collectedcoins").Visible = msoFalse
-        End If
+        Slide21.Shapes("collectedcoins").TextFrame.TextRange.Text = gamesettings_laguange_get("coins_collected") & ": " & Shapes("ncoins").TextFrame.TextRange.Text
         playSound (ActivePresentation.Path & "\MazeMaker_Data\sfx\game_win_transition.wav")
         ActivePresentation.SlideShowWindow.View.GotoSlide 21, msoTrue
     End If
