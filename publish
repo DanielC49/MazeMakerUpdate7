@@ -1,69 +1,97 @@
 Option Explicit
 
-Sub Online_SendCommand(cmd)
-    WebBrowser1.Document.parentWindow.execScript "document.getElementsByTagName(""iframe"")[0].contentWindow.postMessage(""" & cmd & """, ""*"")", "JScript"
+Sub select_maze()
+mazedata.Caption = FS_OpenFileDialog("Maze Maker Projects", ".mmp", gamesettings_laguange_get("select"), gamesettings_laguange_get("select_maze"), ActivePresentation.Path & "\MazeMaker_Data\saves\")
+If mazedata.Caption <> "" Then
+Shapes("pubbox").Visible = msoTrue
+Shapes("hint").Visible = msoFalse
+Shapes("game_txt_select_maze").Visible = msoFalse
+Slide16.loadmaze mazedata.Caption
+mazedata.Caption = FS_ReadFile(mazedata.Caption)
+Slide16.Export ActivePresentation.Path & "\MazeMaker_Data\cache\uploadmaze.jpg", "JPG"
+Shapes("preview").Fill.UserPicture ActivePresentation.Path & "\MazeMaker_Data\cache\uploadmaze.jpg"
+Shapes("preview").PictureFormat.Crop.PictureWidth = 377.0029
+Shapes("preview").PictureFormat.Crop.PictureHeight = 206.9294
+Shapes("preview").PictureFormat.Crop.PictureOffsetX = 0
+Shapes("preview").PictureFormat.Crop.PictureOffsetY = -19.84307
+TextBox1.Text = EQL5_GetElementValue(mazedata.Caption, "title", "", "", , "", "", vbNewLine)
+TextBox1.Visible = True
+ActivePresentation.SlideShowWindow.View.ResetSlideTime
+End If
 End Sub
 
 Sub uploadmaze_publish()
-    On Error GoTo handler
-    Shapes("cover").Visible = msoTrue
-    Shapes("loading_g").Visible = msoTrue
-    Shapes("game_txt_select_maze").Visible = msoFalse
-    Shapes("pubbox").Visible = msoFalse
-    Shapes("btncover").Visible = msoFalse
-    Shapes("db").TextFrame.TextRange.Text = timer
-    DoEvents
-    TextBox1.Visible = False
-    ActivePresentation.SlideShowWindow.View.ResetSlideTime
-    WebBrowser1.Navigate "https://pptgamespt.wixsite.com/pptg-online/api?serverid=b017243e-c4ad-4c61-ab80-2621ad847375"
-    Do Until WebBrowser1.ReadyState = READYSTATE_COMPLETE: Shapes("db").TextFrame.TextRange.Text = timer: DoEvents: Loop
-    Do Until WebBrowser1.Document.getElementById("comp-k9fntwau").textContent = "ready": Shapes("db").TextFrame.TextRange.Text = timer: DoEvents: Loop
-    Online_SendCommand "execute_script c176ae95-b914-4c97-82ee-fc4da985902c true uploadMaze \""" & TextBox1.Text & "\"" \""" & Replace(mazedata.Caption, vbNewLine, "\\\\n") & _
-    "\"" \""" & Mid(mazedata.Caption, InStr(1, mazedata.Caption, "time:") + 5, InStr(InStr(1, mazedata.Caption, "time:"), mazedata.Caption, vbNewLine) - 5 - InStr(1, mazedata.Caption, "time:")) & "\"""
-    Do While WebBrowser1.Document.getElementById("comp-k9fntwau").textContent = "ready": Shapes("db").TextFrame.TextRange.Text = timer: DoEvents: Loop
-    Do While WebBrowser1.Document.getElementById("comp-k9fntwau").textContent = "waiting": Shapes("db").TextFrame.TextRange.Text = timer: DoEvents: Loop
-    If WebBrowser1.Document.getElementById("comp-k9fntwau").textContent = "not logged" Then
+On Error GoTo handler
+Shapes("cover").Visible = msoTrue
+Shapes("loading_g").Visible = msoTrue
+Shapes("game_txt_select_maze").Visible = msoFalse
+Shapes("pubbox").Visible = msoFalse
+Shapes("btncover").Visible = msoFalse
+TextBox1.Visible = False
+ActivePresentation.SlideShowWindow.View.ResetSlideTime
+WebBrowser1.Navigate "https://textuploader.com/"
+Do Until WebBrowser1.ReadyState = READYSTATE_COMPLETE: DoEvents: Loop
+WebBrowser1.Document.getElementById("expiration").selectedIndex = 1
+WebBrowser1.Document.getElementById("type").selectedIndex = 1
+WebBrowser1.Document.getElementById("textdata").value = mazedata.Caption & "mazedatae"
+Shapes("db").TextFrame.TextRange.Text = time
+Pausecode 1
+WebBrowser1.Document.getElementsByTagName("input")(2).Click
+Shapes("db").TextFrame.TextRange.Text = time
+Pausecode 2
+Shapes("db").TextFrame.TextRange.Text = time
+Pausecode 2
+WebBrowser1.Navigate "https://pptgamespt.wixsite.com/pptg-online/maze-maker-upload?env=game&gameversion=" & EQL5_GetElementValue(FS_ReadFile(ActivePresentation.Path & "\MazeMaker_Data\version.mmcf"), "code") _
+& "&title=" & (TextBox1.Text) & "&urlid=" & Right(WebBrowser1.Document.Location.pathname, Len(WebBrowser1.Document.Location.pathname) - 1)
+Do Until WebBrowser1.ReadyState = READYSTATE_COMPLETE: DoEvents: Loop
+Do While WebBrowser1.Document.getElementById("comp-juvk1mu6").innerText = "loading": DoEvents: Loop 'Login
+Do While Left(WebBrowser1.Document.getElementById("comp-jw9jztnr").innerText, 7) = "loading": DoEvents: Loop
+Shapes("db").TextFrame.TextRange.Text = time
+Pausecode 0.5
+Shapes("loading_g").Visible = msoFalse
+If Left(WebBrowser1.Document.getElementById("comp-jw9jztnr").innerText, 5) = "error" Then
+    If WebBrowser1.Document.getElementById("comp-jw9jztnr").innerText = "error: missing data found" Then
+        Shapes("error_g").GroupItems("title").TextFrame.TextRange.Text = gamesettings_laguange_get("error_maze_corrupt")
+        Shapes("error_g").GroupItems("desc").TextFrame.TextRange.Text = gamesettings_laguange_get("error_maze_missing_data_found")
+        FS_ExportFile ActivePresentation.Path & "\MazeMaker_Data\errorlogs\" & Date$ & " " & " " & Hour(time) & " " & Minute(time) & " " & Second(time) & ".log", "online_upload_maze_publish:error_maze_corrupt:error_maze_missing_data_found" & vbNewLine & WebBrowser1.Document.getElementById("comp-jw9jztnr").innerText
+    ElseIf WebBrowser1.Document.getElementById("comp-jw9jztnr").innerText = "error: no content" Then
+        Shapes("error_g").GroupItems("title").TextFrame.TextRange.Text = gamesettings_laguange_get("error_maze_no_content")
+        Shapes("error_g").GroupItems("desc").TextFrame.TextRange.Text = " "
+    ElseIf WebBrowser1.Document.getElementById("comp-jw9jztnr").innerText = "error: unsupported version" Then
+        Shapes("error_g").GroupItems("title").TextFrame.TextRange.Text = gamesettings_laguange_get("error_unsupported_version")
+        Shapes("error_g").GroupItems("desc").TextFrame.TextRange.Text = gamesettings_laguange_get("error_maze_unsupported_version")
+    ElseIf WebBrowser1.Document.getElementById("comp-jw9jztnr").innerText = "error: duplicate maze title" Then
+        Shapes("error_g").GroupItems("title").TextFrame.TextRange.Text = gamesettings_laguange_get("error_duplicate_maze")
+        Shapes("error_g").GroupItems("desc").TextFrame.TextRange.Text = gamesettings_laguange_get("error_online_duplicate_maze")
+    ElseIf WebBrowser1.Document.getElementById("comp-jw9jztnr").innerText = "error: outdated version" Then
+        game_gotoerror gamesettings_laguange_get("error_online_outdated_version"), gamesettings_laguange_get("error_online_outdated_version_desc")
+        uploadmaze_reset
+    ElseIf WebBrowser1.Document.getElementById("comp-jw9jztnr").innerText = "error: not logged" Then
         ActivePresentation.SlideShowWindow.View.GotoSlide 23
         uploadmaze_reset
         Slide23.WebBrowser1.Navigate "https://pptgamespt.wixsite.com/pptg-online/sign-in?env=game"
         Slide23.Label1.Caption = "Loading"
-    ElseIf WebBrowser1.Document.getElementById("comp-k9fntwau").textContent = "done" Then
-        Slide18.Shapes("success_g").Visible = msoTrue
     Else
-        Shapes("loading_g").Visible = msoFalse
-        Shapes("error_g").Visible = msoTrue
         Shapes("error_g").GroupItems("title").TextFrame.TextRange.Text = gamesettings_laguange_get("unknown_error_code")
         Shapes("error_g").GroupItems("desc").TextFrame.TextRange.Text = gamesettings_laguange_get("contact_support")
-        FS_ExportFile ActivePresentation.Path & "\MazeMaker_Data\errorlogs\" & Date$ & " " & " " & Hour(time) & " " & Minute(time) & " " & Second(time) & ".log", "online_upload_maze_publish:unknown_reponse" & vbNewLine & WebBrowser1.Document.getElementById("comp-k9fntwau").innerText
+        FS_ExportFile ActivePresentation.Path & "\MazeMaker_Data\errorlogs\" & Date$ & " " & " " & Hour(time) & " " & Minute(time) & " " & Second(time) & ".log", "online_upload_maze_publish:unknown_error_code" & vbNewLine & WebBrowser1.Document.getElementById("comp-jw9jztnr").innerText
     End If
-    
+    Shapes("error_g").Visible = msoTrue
+ElseIf WebBrowser1.Document.getElementById("comp-jw9jztnr").innerText = "done" Then
+    Slide18.Shapes("success_g").Visible = msoTrue
+Else
+    Shapes("error_g").Visible = msoTrue
+    Shapes("error_g").GroupItems("title").TextFrame.TextRange.Text = gamesettings_laguange_get("unknown_error")
+    Shapes("error_g").GroupItems("desc").TextFrame.TextRange.Text = gamesettings_laguange_get("contact_support")
+    FS_ExportFile ActivePresentation.Path & "\MazeMaker_Data\errorlogs\" & Date$ & " " & " " & Hour(time) & " " & Minute(time) & " " & Second(time) & ".log", "online_upload_maze_publish:unknown_error" & vbNewLine & WebBrowser1.Document.getElementById("comp-jw9jztnr").innerText
+End If
 Exit Sub
-handler:
 game_createerrorlog "upload_maze_publish" & vbNewLine & "Details" & vbNewLine & "Number: " & Err.Number & vbNewLine & "Description: " & Err.Description
+handler:
 Shapes("loading_g").Visible = msoFalse
 Shapes("error_g").Visible = msoTrue
 Shapes("error_g").GroupItems("title").TextFrame.TextRange.Text = gamesettings_laguange_get("unexpected_error")
 Shapes("error_g").GroupItems("desc").TextFrame.TextRange.Text = gamesettings_laguange_get("contact_support")
-End Sub
-
-Sub select_maze()
-    mazedata.Caption = FS_OpenFileDialog("Maze Maker Projects", ".mmp", gamesettings_laguange_get("select"), gamesettings_laguange_get("select_maze"), ActivePresentation.Path & "\MazeMaker_Data\saves\")
-    If mazedata.Caption <> "" Then
-        Shapes("pubbox").Visible = msoTrue
-        Shapes("hint").Visible = msoFalse
-        Shapes("game_txt_select_maze").Visible = msoFalse
-        Slide16.loadmaze mazedata.Caption
-        mazedata.Caption = FS_ReadFile(mazedata.Caption)
-        Slide16.Export ActivePresentation.Path & "\MazeMaker_Data\cache\uploadmaze.jpg", "JPG"
-        Shapes("preview").Fill.UserPicture ActivePresentation.Path & "\MazeMaker_Data\cache\uploadmaze.jpg"
-        Shapes("preview").PictureFormat.Crop.PictureWidth = 377.0029
-        Shapes("preview").PictureFormat.Crop.PictureHeight = 206.9294
-        Shapes("preview").PictureFormat.Crop.PictureOffsetX = 0
-        Shapes("preview").PictureFormat.Crop.PictureOffsetY = -19.84307
-        TextBox1.Text = EQL5_GetElementValue(mazedata.Caption, "title", "", "", , "", "", vbNewLine)
-        TextBox1.Visible = True
-        ActivePresentation.SlideShowWindow.View.ResetSlideTime
-    End If
 End Sub
 
 Sub uploadmaze_success_close()
