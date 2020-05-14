@@ -1,5 +1,12 @@
 Option Explicit
 
+Sub OnSlideShowPageChange()
+If ActivePresentation.SlideShowWindow.View.CurrentShowPosition = 9 And Shapes("online_warning").TextFrame.TextRange.Text = "0" Then
+    Shapes("online_warning").TextFrame.TextRange.Text = "1"
+    MsgBox gamesettings_laguange_get("online_warning")
+End If
+End Sub
+
 Sub Online_SendCommand(cmd)
     WebBrowser1.Document.parentWindow.execScript "document.getElementsByTagName(""iframe"")[0].contentWindow.postMessage(""" & cmd & """, ""*"")", "JScript"
 End Sub
@@ -301,5 +308,3 @@ Private Sub TextBox1_Change()
         Next
     End If
 End Sub
-
-
