@@ -3,7 +3,7 @@ Option Explicit
 Sub OnSlideShowPageChange()
 If ActivePresentation.SlideShowWindow.View.CurrentShowPosition = 9 And Shapes("online_warning").TextFrame.TextRange.Text = "0" Then
     Shapes("online_warning").TextFrame.TextRange.Text = "1"
-    MsgBox gamesettings_laguange_get("online_warning")
+    MsgBox gamesettings_laguange_get("online_warning"), vbInformation, gamesettings_laguange_get("online_warning_title")
 End If
 End Sub
 
