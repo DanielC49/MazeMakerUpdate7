@@ -189,13 +189,13 @@ ActivePresentation.VBProject.VBComponents.Item("Slide10").CodeModule.DeleteLines
 ActivePresentation.VBProject.VBComponents.Item("Slide10").CodeModule.AddFromFile ActivePresentation.Path & "\MazeMaker_Data\cache\update7\saves"
 
 updateprogress 0.93, "Importing... '..\MazeMaker_Data\cache\update7\publish'"
-ActivePresentation.VBProject.VBComponents.Item("Slide18").CodeModule.DeleteLines 1, ActivePresentation.VBProject.VBComponents.Item '("Slide18").CodeModule.CountOfLines
+ActivePresentation.VBProject.VBComponents.Item("Slide18").CodeModule.DeleteLines 1, ActivePresentation.VBProject.VBComponents.Item("Slide18").CodeModule.CountOfLines
 ActivePresentation.VBProject.VBComponents.Item("Slide18").CodeModule.AddFromFile ActivePresentation.Path & "\MazeMaker_Data\cache\update7\publish"
 
 updateprogress 0.94, "Updating changelog files... '..\MazeMaker_Data\changelog\*'"
-FS_ExportFile ActivePresentation.Path & "\MazeMaker_Data\changelog\en-gb.txt", Replace(FS_ReadFile(ActivePresentation.Path & "\MazeMaker_Data\cache\update7\changelog_en-gb.txt"), "\", "ï")
-FS_ExportFile ActivePresentation.Path & "\MazeMaker_Data\changelog\pt-br.txt", Replace(FS_ReadFile(ActivePresentation.Path & "\MazeMaker_Data\cache\update7\changelog_pt-br.txt"), "\", "ï")
-FS_ExportFile ActivePresentation.Path & "\MazeMaker_Data\changelog\pt-pt.txt", Replace(FS_ReadFile(ActivePresentation.Path & "\MazeMaker_Data\cache\update7\changelog_pt-pt.txt"), "\", "ï")
+FS_ExportFile ActivePresentation.Path & "\MazeMaker_Data\changelog\en-gb.txt", Replace(FS_ReadFile(ActivePresentation.Path & "\MazeMaker_Data\cache\update7\changelog_en-gb.txt"), "\", "¬ï")
+FS_ExportFile ActivePresentation.Path & "\MazeMaker_Data\changelog\pt-br.txt", Replace(FS_ReadFile(ActivePresentation.Path & "\MazeMaker_Data\cache\update7\changelog_pt-br.txt"), "\", "¬ï")
+FS_ExportFile ActivePresentation.Path & "\MazeMaker_Data\changelog\pt-pt.txt", Replace(FS_ReadFile(ActivePresentation.Path & "\MazeMaker_Data\cache\update7\changelog_pt-pt.txt"), "\", "¬ï")
 
 updateprogress 0.96, "Updating language files... '..\MazeMaker_Data\langs\en-gb.mmlp'"
 FS_ExportFile ActivePresentation.Path & "\MazeMaker_Data\langs\en-gb.mmlp", FS_ReadFile(ActivePresentation.Path & "\MazeMaker_Data\langs\en-gb.mmlp") & vbNewLine & _
@@ -219,7 +219,7 @@ FS_ExportFile ActivePresentation.Path & "\MazeMaker_Data\langs\pt-br.mmlp", FS_R
 """onoff_block"":""Bloco lig/des"";" & vbNewLine & _
 """collect_time"":""Coletar tempo"";" & vbNewLine & _
 """online_warning_title"":""Comunicado importante da PPTGames"";" & vbNewLine & _
-"""online_warning"":""Obrigado por instalar a atualizaÁ„o 1.4.0 do Maze Maker!" & vbNewLine & vbNewLine & "Por favor, n„o publique labirintos que contenham bugs ou que sejam impossÌveis de concluir. Removeremos labirintos que n„o seguem essas regras e talvez seja necess·rio proibir a conta do autor de publicar labirintos na comunidade online do Maze Maker."";"
+"""online_warning"":""Obrigado por instalar a atualiza√ß√£o 1.4.0 do Maze Maker!" & vbNewLine & vbNewLine & "Por favor, n√£o publique labirintos que contenham bugs ou que sejam imposs√≠veis de concluir. Removeremos labirintos que n√£o seguem essas regras e talvez seja necess√°rio proibir a conta do autor de publicar labirintos na comunidade online do Maze Maker."";"
 
 updateprogress 0.98, "Updating language files... '..\MazeMaker_Data\langs\pt-pt.mmlp'"
 FS_ExportFile ActivePresentation.Path & "\MazeMaker_Data\langs\pt-pt.mmlp", FS_ReadFile(ActivePresentation.Path & "\MazeMaker_Data\langs\pt-pt.mmlp") & vbNewLine & _
@@ -231,7 +231,7 @@ FS_ExportFile ActivePresentation.Path & "\MazeMaker_Data\langs\pt-pt.mmlp", FS_R
 """onoff_block"":""Bloco lig/des"";" & vbNewLine & _
 """collect_time"":""Coletar tempo"";" & vbNewLine & _
 """online_warning_title"":""Comunicado importante da PPTGames"";" & vbNewLine & _
-"""online_warning"":""Obrigado por instalar a atualizaÁ„o 1.4.0 do Maze Maker!" & vbNewLine & vbNewLine & "Por favor, n„o publique labirintos que contenham bugs ou que sejam impossÌveis de concluir. Removeremos labirintos que n„o seguem estas regras e talvez seja necess·rio proibir a conta do autor de publicar labirintos na comunidade online do Maze Maker."";"
+"""online_warning"":""Obrigado por instalar a atualiza√ß√£o 1.4.0 do Maze Maker!" & vbNewLine & vbNewLine & "Por favor, n√£o publique labirintos que contenham bugs ou que sejam imposs√≠veis de concluir. Removeremos labirintos que n√£o seguem estas regras e talvez seja necess√°rio proibir a conta do autor de publicar labirintos na comunidade online do Maze Maker."";"
 
 updateprogress 0.99, "Updating game content..."
 
@@ -243,13 +243,13 @@ End With
 With Slide4.Shapes("game_txt_save")
     .TextFrame.TextRange.Text = ""
     .Width = .Height
-    .Left = Slide4.Shapes("Ret‚ngulo 88").Left - 2 * .Width - 26
+    .Left = Slide4.Shapes("Ret√¢ngulo 88").Left - 2 * .Width - 26
 End With
 
 With Slide4.Shapes("game_txt_publish")
     .TextFrame.TextRange.Text = ""
     .Width = .Height
-    .Left = Slide4.Shapes("Ret‚ngulo 88").Left - .Width - 13
+    .Left = Slide4.Shapes("Ret√¢ngulo 88").Left - .Width - 13
 End With
 
 With Slide4.Shapes.AddShape(msoShapeRectangle, Slide4.Shapes("game_txt_save").Left + Slide4.Shapes("game_txt_save").Width / 2 - 8, _
@@ -284,16 +284,16 @@ With Slide4.Shapes("mazecoloroption").Duplicate
 End With
 Slide4.Shapes("game_txt_publish").Name = "maze_publish"
 
-With Slide4.Shapes.Range(Array("Conex„o reta 137", "mazetimeoption", "mazetime", "Gr·fico 16", "Ret‚ngulo: Cantos Arredondados 73", _
-"mazecoloroption", "Agrupar 78", "Ret‚ngulo: Cantos Arredondados 76")).Group
+With Slide4.Shapes.Range(Array("Conex√£o reta 137", "mazetimeoption", "mazetime", "Gr√°fico 16", "Ret√¢ngulo: Cantos Arredondados 73", _
+"mazecoloroption", "Agrupar 78", "Ret√¢ngulo: Cantos Arredondados 76")).Group
     .Left = 600
     .Ungroup
 End With
 
-With Slide4.Shapes("Ret‚ngulo: Cantos Arredondados 76").Duplicate
+With Slide4.Shapes("Ret√¢ngulo: Cantos Arredondados 76").Duplicate
     .Name = "goalback"
     .Left = 512
-    .Top = Slide4.Shapes("Ret‚ngulo: Cantos Arredondados 76").Top
+    .Top = Slide4.Shapes("Ret√¢ngulo: Cantos Arredondados 76").Top
     .Width = 80
 End With
 
@@ -340,7 +340,7 @@ With Slide5.Shapes.AddShape(msoShapeRoundedRectangle, 355, 65, 250, 40)
     End With
 End With
 
-Slide4.Shapes("Ret‚ngulo: Cantos Arredondados 90").Name = "elements_back"
+Slide4.Shapes("Ret√¢ngulo: Cantos Arredondados 90").Name = "elements_back"
 Slide4.Shapes("elements_back").Width = 190
 Slide4.Shapes.Range(Array("Agrupar 38", "item1option")).Group.Name = "temp_element_block_group"
 With Slide4.Shapes("temp_element_block_group").Duplicate
