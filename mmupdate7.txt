@@ -1,5 +1,3 @@
-Attribute VB_Name = "update7_installer"
-
 Sub update7()
 On Error GoTo handler
 
